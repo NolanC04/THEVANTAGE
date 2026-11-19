@@ -51,4 +51,4 @@ Membership tiers above plus: AAPEX free for verified active duty and veterans; m
 
 ## Images
 
-The canvas images are oil paintings hosted inside the canvas. Until Nolan exports them to `public/images/`, render a dark #16130E block with the alt text as a caption. Never substitute stock photos.
+The 23 oil paintings are in `public/images/paintings/` (JPEG), catalogued with alt text in `docs/design/README.md`. The approved page source is in `docs/design/canvas/` with image paths already pointing there. Never substitute stock photos.
