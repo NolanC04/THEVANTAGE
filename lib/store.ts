@@ -1,0 +1,180 @@
+import "server-only";
+import { promises as fs } from "fs";
+import path from "path";
+import { randomUUID } from "crypto";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { env, supabaseConfigured, devStoreAllowed, ConfigError } from "./env";
+import { withRetry } from "./retry";
+import { seedData } from "./seed";
+
+export type TableName =
+  | "members"
+  | "programs"
+  | "modules"
+  | "library_items"
+  | "almanac_entries"
+  | "dome"
+  | "purchases"
+  | "cohorts"
+  | "cohort_applications"
+  | "org_inquiries"
+  | "subscribers"
+  | "import_drafts"
+  | "publish_log";
+
+type Row = Record<string, unknown>;
+type Match = Record<string, string | number | boolean | null>;
+
+/**
+ * One data door. Supabase (service role, server only) when configured;
+ * otherwise a local JSON file for development previews. RLS policies in
+ * supabase/migrations protect direct API access; server code also filters by member.
+ */
+export interface Store {
+  list<T>(table: TableName, match?: Match, order?: { column: string; ascending?: boolean }): Promise<T[]>;
+  get<T>(table: TableName, match: Match): Promise<T | null>;
+  insert<T>(table: TableName, row: Row): Promise<T>;
+  update<T>(table: TableName, match: Match, patch: Row): Promise<T[]>;
+  upsert<T>(table: TableName, row: Row, onConflict: string): Promise<T>;
+  count(table: TableName, match?: Match): Promise<number>;
+}
+
+let admin: SupabaseClient | null = null;
+export function supabaseAdmin(): SupabaseClient {
+  if (!supabaseConfigured()) throw new ConfigError("Supabase");
+  admin ??= createClient(env.supabaseUrl, env.supabaseServiceKey, { auth: { persistSession: false } });
+  return admin;
+}
+
+const supabaseStore: Store = {
+  async list(table, match, order) {
+    return withRetry(async () => {
+      let q = supabaseAdmin().from(table).select("*");
+      if (match) q = q.match(match as Record<string, string>);
+      if (order) q = q.order(order.column, { ascending: order.ascending ?? true });
+      const { data, error } = await q;
+      if (error) throw new Error(`${table}: ${error.message}`);
+      return (data ?? []) as never[];
+    });
+  },
+  async get(table, match) {
+    return withRetry(async () => {
+      const { data, error } = await supabaseAdmin().from(table).select("*").match(match as Record<string, string>).limit(1);
+      if (error) throw new Error(`${table}: ${error.message}`);
+      return ((data ?? [])[0] ?? null) as never;
+    });
+  },
+  async insert(table, row) {
+    return withRetry(async () => {
+      const { data, error } = await supabaseAdmin().from(table).insert(row).select("*").single();
+      if (error) throw new Error(`${table}: ${error.message}`);
+      return data as never;
+    });
+  },
+  async update(table, match, patch) {
+    return withRetry(async () => {
+      const { data, error } = await supabaseAdmin().from(table).update(patch).match(match as Record<string, string>).select("*");
+      if (error) throw new Error(`${table}: ${error.message}`);
+      return (data ?? []) as never[];
+    });
+  },
+  async upsert(table, row, onConflict) {
+    return withRetry(async () => {
+      const { data, error } = await supabaseAdmin().from(table).upsert(row, { onConflict }).select("*").single();
+      if (error) throw new Error(`${table}: ${error.message}`);
+      return data as never;
+    });
+  },
+  async count(table, match) {
+    return withRetry(async () => {
+      let q = supabaseAdmin().from(table).select("*", { count: "exact", head: true });
+      if (match) q = q.match(match as Record<string, string>);
+      const { count, error } = await q;
+      if (error) throw new Error(`${table}: ${error.message}`);
+      return count ?? 0;
+    });
+  },
+};
+
+// ---------- development JSON store ----------
+const file = path.join(process.cwd(), ".data", "store.json");
+type Db = Record<string, Row[]>;
+let chain: Promise<unknown> = Promise.resolve();
+
+async function readDb(): Promise<Db> {
+  try {
+    return JSON.parse(await fs.readFile(file, "utf8")) as Db;
+  } catch {
+    const db = seedData() as unknown as Db;
+    await fs.mkdir(path.dirname(file), { recursive: true });
+    await fs.writeFile(file, JSON.stringify(db, null, 2));
+    return db;
+  }
+}
+async function mutate<T>(fn: (db: Db) => T): Promise<T> {
+  const run = chain.then(async () => {
+    const db = await readDb();
+    const out = fn(db);
+    await fs.writeFile(file, JSON.stringify(db, null, 2));
+    return out;
+  });
+  chain = run.catch(() => undefined);
+  return run;
+}
+const matches = (row: Row, match?: Match) =>
+  !match || Object.entries(match).every(([k, v]) => row[k] === v);
+
+const devStore: Store = {
+  async list(table, match, order) {
+    const rows = ((await readDb())[table] ?? []).filter((r) => matches(r, match));
+    if (order) {
+      rows.sort((a, b) => {
+        const x = a[order.column] as string | number, y = b[order.column] as string | number;
+        return (x > y ? 1 : x < y ? -1 : 0) * (order.ascending === false ? -1 : 1);
+      });
+    }
+    return rows as never[];
+  },
+  async get(table, match) {
+    return (((await readDb())[table] ?? []).find((r) => matches(r, match)) ?? null) as never;
+  },
+  async insert(table, row) {
+    return mutate((db) => {
+      const full = { id: randomUUID(), created_at: new Date().toISOString(), ...row };
+      (db[table] ??= []).push(full);
+      return full as never;
+    });
+  },
+  async update(table, match, patch) {
+    return mutate((db) => {
+      const hit = (db[table] ?? []).filter((r) => matches(r, match));
+      hit.forEach((r) => Object.assign(r, patch));
+      return hit as never[];
+    });
+  },
+  async upsert(table, row, onConflict) {
+    return mutate((db) => {
+      const keys = onConflict.split(",").map((k) => k.trim());
+      const rows = (db[table] ??= []);
+      const existing = rows.find((r) => keys.every((k) => r[k] === row[k]));
+      if (existing) {
+        Object.assign(existing, row);
+        return existing as never;
+      }
+      const full = { id: randomUUID(), created_at: new Date().toISOString(), ...row };
+      rows.push(full);
+      return full as never;
+    });
+  },
+  async count(table, match) {
+    return ((await readDb())[table] ?? []).filter((r) => matches(r, match)).length;
+  },
+};
+
+export function store(): Store {
+  if (supabaseConfigured()) return supabaseStore;
+  if (devStoreAllowed()) return devStore;
+  throw new ConfigError("Supabase (production requires it)");
+}
+
+export const usingDevStore = () => !supabaseConfigured();
