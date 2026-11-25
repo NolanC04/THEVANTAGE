@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { programBySlug, moduleOf } from "@/lib/content";
-import { currentMember } from "@/lib/auth";
+import { currentMember, isAdmin } from "@/lib/auth";
 import { moduleGate } from "@/lib/access";
 import { phaseFor } from "@/lib/seed";
 import { renderMarkdown } from "@/lib/markdown";
 import { store } from "@/lib/store";
 import type { AlmanacEntry } from "@/lib/types";
 import { GeneAsks } from "@/components/GeneAsks";
+import { FrameworkShelf } from "@/components/frameworks/FrameworkCard";
+import { frameworksForModule } from "@/lib/frameworks/registry";
 
 export const dynamic = "force-dynamic";
 
@@ -47,6 +49,8 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
     );
   }
 
+  const admin = isAdmin(member);
+  const practice = slug === "aapex" ? frameworksForModule(number, admin) : [];
   const sealed = member ? await store().get<AlmanacEntry>("almanac_entries", { member_id: member.id, program_slug: slug, module_number: number }) : null;
 
   return (
@@ -70,6 +74,11 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
           <p><span className="bracket">[NOLAN: Module {number} lesson arrives as an approved Studiolo release]</span></p>
         )}
       </article>
+      {practice.length > 0 && (
+        <section className="wrap max-w-[920px] pb-20" aria-label="Practice">
+          <FrameworkShelf frameworks={practice} admin={admin} eyebrowClass="eyebrow" />
+        </section>
+      )}
       <section className="wrap max-w-[920px] pb-[var(--section)]">
         <GeneAsks
           programSlug={slug}

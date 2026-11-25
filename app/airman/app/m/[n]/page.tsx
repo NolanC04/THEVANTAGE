@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { currentProfile } from "@/lib/airman/auth";
+import { currentProfile, isAdmin } from "@/lib/airman/auth";
 import { moduleRow, canRead, ensureEntry } from "@/lib/airman/data";
 import { store } from "@/lib/airman/store";
 import { buildSlides, visibleSlides } from "@/lib/airman/slides";
 import { code, phaseOf, sessionOf, LEARNER_FIELDS, type ModuleContent } from "@/lib/airman/program";
 import { Player } from "./Player";
+import { FrameworkShelf } from "@/components/frameworks/FrameworkCard";
+import { frameworksForModule } from "@/lib/frameworks/registry";
 
 export default async function ModulePage({ params }: { params: Promise<{ n: string }> }) {
   const n = Number((await params).n);
@@ -37,6 +39,7 @@ export default async function ModulePage({ params }: { params: Promise<{ n: stri
       content={learner}
       entry={{ bridge: entry.bridge, bridge_at: entry.bridge_at, remix: entry.remix, quick_check: entry.quick_check, gene: entry.gene, sealed_at: entry.sealed_at, shared: entry.shared }}
       closingLaw={law?.approved ? law.text : null}
+      practice={<FrameworkShelf frameworks={frameworksForModule(n, isAdmin(p))} admin={isAdmin(p)} eyebrowClass="k" title="PRACTICE · ON YOUR OWN" />}
     />
   );
 }
