@@ -16,7 +16,7 @@ export default async function Almanac() {
   return (
     <main className="page" style={{ display: "grid", gap: 14 }}>
       <h1 style={{ fontSize: 22, margin: "8px 0 0" }}>Your Almanac</h1>
-      <p className="help" style={{ margin: 0 }}>Only you read this. A facilitator sees an entry only if you share it. {sealed.length} of 24 sealed.</p>
+      <p className="help" style={{ margin: 0 }}>Only you read this. A facilitator sees an entry only if you share it. {sealed.length} of {mods.length} sealed.</p>
       {reflection && <Reflection id={reflection.id} text={reflection.text} />}
       {PHASES.map((ph) => {
         const list = sealed.filter((e) => phaseOf(e.module_number).key === ph.key);
