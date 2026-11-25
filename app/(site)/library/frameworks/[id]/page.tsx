@@ -5,6 +5,7 @@ import { currentMember, isAdmin } from "@/lib/auth";
 import { hasPaidAccess } from "@/lib/access";
 import { frameworkById, FRAMEWORKS } from "@/lib/frameworks/registry";
 import { FrameworkCard } from "@/components/frameworks/FrameworkCard";
+import { memberSaved } from "@/lib/frameworks/entries";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,7 @@ export default async function FrameworkPage({ params }: { params: Promise<{ id: 
   const admin = isAdmin(member);
   if (!f || (f.status === "held" && !admin)) notFound();
   const open = admin || (member != null && hasPaidAccess(member));
+  const saved = open && member ? (await memberSaved(member.id))[f.id] ?? null : null;
   const live = FRAMEWORKS.filter((x) => x.status === "live" || admin);
   const i = live.findIndex((x) => x.id === f.id);
   const prev = live[i - 1], next = live[i + 1];
@@ -27,7 +29,7 @@ export default async function FrameworkPage({ params }: { params: Promise<{ id: 
     <div className="wrap pt-[150px] pb-[var(--section)] max-w-[1080px]">
       <p className="eyebrow"><Link href="/library/frameworks" className="no-underline">Frameworks</Link></p>
       {open ? (
-        <div className="mt-8"><FrameworkCard fw={f} admin={admin} heading="h1" /></div>
+        <div className="mt-8"><FrameworkCard fw={f} admin={admin} heading="h1" saved={saved} save={member ? { endpoint: "/api/frameworks/save" } : undefined} /></div>
       ) : (
         <article className="max-w-[760px]">
           <p className="text-[13px] mt-6 mb-0" style={{ color: "var(--color-dim)" }}>{f.type}</p>

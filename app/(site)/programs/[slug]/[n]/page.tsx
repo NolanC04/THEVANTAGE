@@ -10,6 +10,7 @@ import type { AlmanacEntry } from "@/lib/types";
 import { GeneAsks } from "@/components/GeneAsks";
 import { FrameworkShelf } from "@/components/frameworks/FrameworkCard";
 import { frameworksForModule } from "@/lib/frameworks/registry";
+import { memberSaved } from "@/lib/frameworks/entries";
 
 export const dynamic = "force-dynamic";
 
@@ -51,6 +52,7 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
 
   const admin = isAdmin(member);
   const practice = slug === "aapex" ? frameworksForModule(number, admin) : [];
+  const savedFw = member && practice.length ? await memberSaved(member.id) : {};
   const sealed = member ? await store().get<AlmanacEntry>("almanac_entries", { member_id: member.id, program_slug: slug, module_number: number }) : null;
 
   return (
@@ -76,7 +78,7 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
       </article>
       {practice.length > 0 && (
         <section className="wrap max-w-[920px] pb-20" aria-label="Practice">
-          <FrameworkShelf frameworks={practice} admin={admin} eyebrowClass="eyebrow" />
+          <FrameworkShelf frameworks={practice} admin={admin} eyebrowClass="eyebrow" saved={savedFw} save={member ? { endpoint: "/api/frameworks/save", moduleNumber: number } : undefined} />
         </section>
       )}
       <section className="wrap max-w-[920px] pb-[var(--section)]">

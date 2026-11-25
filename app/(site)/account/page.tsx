@@ -9,6 +9,8 @@ import { phaseFor } from "@/lib/seed";
 import type { AlmanacEntry, DomeRow } from "@/lib/types";
 import { DomeEditor } from "@/components/DomeEditor";
 import { PostButton } from "@/components/PostButton";
+import { memberFrameworkEntries } from "@/lib/frameworks/entries";
+import { frameworkById } from "@/lib/frameworks/registry";
 
 export const metadata: Metadata = { title: "Your library", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -20,13 +22,14 @@ export default async function Account() {
   if (!member) redirect("/begin?next=/account");
   const db = store();
   const program = await programBySlug("aapex");
-  const [tracks, sealed, domeRow, purchases, cohort] = await Promise.all([
+  const [tracks, sealed, domeRow, purchases, cohort, frameworks] = await Promise.all([
     program ? tracklist(program.id) : Promise.resolve([]),
     // Almanac: only the signed-in member's own entries (RLS enforces the same on direct API access).
     db.list<AlmanacEntry>("almanac_entries", { member_id: member.id }),
     db.get<DomeRow>("dome", { member_id: member.id }),
     purchasesOf(member.id),
     currentCohort(),
+    memberFrameworkEntries(member.id),
   ]);
   const seats = cohort ? cohort.seats - (await seatsTaken(cohort.id)) : 0;
   const sealedSet = new Set(sealed.filter((s) => s.program_slug === "aapex").map((s) => s.module_number));
@@ -104,6 +107,25 @@ export default async function Account() {
                 </li>
               ))}
             </ol>
+          )}
+          {frameworks.length > 0 && (
+            <div className="mt-14">
+              <p className="eyebrow">Frameworks you&apos;ve worked</p>
+              <ol className="mt-4 p-0 list-none">
+                {frameworks.map((e) => {
+                  const f = frameworkById(e.framework_id);
+                  if (!f) return null;
+                  const href = e.module_number ? `/programs/aapex/${e.module_number}#${f.id}` : `/library/frameworks/${f.id}`;
+                  return (
+                    <li key={e.framework_id} className="rule-top py-6">
+                      <p className="eyebrow text-[11px]">{e.module_number ? `Module ${e.module_number} · ` : ""}saved {new Date(e.saved_at).toLocaleDateString()}</p>
+                      <p className="title text-[22px] mt-3 mb-0"><Link href={href} className="no-underline" style={{ color: "var(--color-text)" }}>{f.title}</Link></p>
+                      {e.summary && <p className="body mt-2 mb-0 text-[15px]">{e.summary}</p>}
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
           )}
           <p className="mt-8 text-[13px]" style={{ color: "var(--color-dim)" }}>Your Almanac is private. No one else can read it.</p>
         </section>

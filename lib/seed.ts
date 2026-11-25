@@ -107,6 +107,7 @@ export function seedData() {
     modules,
     library_items,
     almanac_entries: [],
+    framework_entries: [],
     dome: [],
     purchases: [],
     cohorts,

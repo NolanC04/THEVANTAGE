@@ -40,3 +40,25 @@ test("the tool copy itself passes the public rules", () => {
   const found = checkPublic({ tools }, { aapexAllowed: false, authorOfRecord: "Nolan Langford" }).filter((x) => x.rule !== "placeholder");
   assert.deepEqual(found, [], found.map((x) => x.match).join(", "));
 });
+
+import { cleanSave, MAX_SAVE_BYTES } from "../lib/frameworks/save.ts";
+
+test("saves: only real, open frameworks; module kept only where the framework is placed", () => {
+  assert.equal(cleanSave({ framework_id: "nope", data: {} }, false).ok, false);
+  assert.equal(cleanSave({ framework_id: "hcos-radar", data: { s1: [5] } }, false).ok, false);
+  assert.equal(cleanSave({ framework_id: "hcos-radar", data: { s1: [5] } }, true).ok, true);
+  assert.equal(cleanSave({ framework_id: "focus-funnel", data: [] }, false).ok, false);
+  const good = cleanSave({ framework_id: "focus-funnel", module_number: 2, data: { s1: ["a"] }, summary: " x " }, false);
+  assert.ok(good.ok && good.value.module_number === 2 && good.value.summary === "x");
+  const moved = cleanSave({ framework_id: "focus-funnel", module_number: 7, data: { s1: ["a"] } }, false);
+  assert.ok(moved.ok && moved.value.module_number === null);
+  const big = cleanSave({ framework_id: "focus-funnel", data: { s1: "x".repeat(MAX_SAVE_BYTES) } }, false);
+  assert.ok(!big.ok && big.status === 413);
+});
+
+test("the migration keeps saved frameworks owner-only on both sides", () => {
+  const sql = readFileSync(new URL("../supabase/migrations/20261125100000_framework_entries.sql", import.meta.url), "utf8");
+  const policies = sql.match(/create policy[^;]+;/g) ?? [];
+  assert.equal(policies.length, 2);
+  assert.ok(policies.every((p) => /for all/.test(p) && /auth\.uid\(\)/.test(p) && !/is_staff|facilitator|admin/.test(p)));
+});
