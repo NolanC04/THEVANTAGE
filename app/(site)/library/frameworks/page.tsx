@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { currentMember, isAdmin } from "@/lib/auth";
 import { visibleFrameworks } from "@/lib/frameworks/registry";
 
-export const metadata: Metadata = { title: "Frameworks", description: "Interactive frameworks from The Vantage: self-assessments, maps and builds you work through on the page." };
+export const metadata: Metadata = { title: "Catalyst Concepts", description: "Interactive frameworks from The Vantage: self-assessments, maps and builds you work through on the page." };
 export const dynamic = "force-dynamic";
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -15,7 +15,7 @@ export default async function Frameworks() {
     <div className="pt-[120px] md:pt-[150px]">
       <section className="wrap">
         <p className="eyebrow">The Library · Frameworks</p>
-        <h1 className="h2 mt-6 max-w-[18ch]">Ideas you can work with your hands.</h1>
+        <h1 className="h2 mt-6 max-w-[18ch]">Catalyst Concepts</h1>
         <p className="body mt-6 max-w-[36rem]">Each framework is drawn, then made to answer back: rate yourself, build the structure, run the test. Members open every one. Some also sit inside a program module, where they arrive as that lesson&apos;s practice.</p>
       </section>
       <section className="wrap section" aria-labelledby="fw-shelf">

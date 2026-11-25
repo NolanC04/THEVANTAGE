@@ -20,7 +20,7 @@ test("every live framework has a working component", () => {
 
 test("held frameworks stay out of learner views and module shelves", () => {
   const held = FRAMEWORKS.filter((f) => f.status === "held").map((f) => f.id);
-  assert.ok(held.includes("optimization-stack") && held.includes("hcos-radar") && held.includes("versatilist"));
+  assert.ok(held.includes("hcos-radar") && held.includes("versatilist"));
   assert.ok(visibleFrameworks(false).every((f) => f.status === "live"));
   for (let n = 1; n <= 24; n++) assert.ok(frameworksForModule(n, false).every((f) => f.status === "live"));
   assert.ok(frameworksForModule(19, true).some((f) => f.id === "versatilist"));
@@ -33,4 +33,10 @@ test("ids are unique and placements point at real modules", () => {
 
 test("module 02 carries the focus funnel and the goal tree", () => {
   assert.deepEqual(frameworksForModule(2, false).map((f) => f.id), ["focus-funnel", "goal-system-tree"]);
+});
+
+test("the tool copy itself passes the public rules", () => {
+  // [NOLAN: …] gaps are intentional here; every other rule must pass.
+  const found = checkPublic({ tools }, { aapexAllowed: false, authorOfRecord: "Nolan Langford" }).filter((x) => x.rule !== "placeholder");
+  assert.deepEqual(found, [], found.map((x) => x.match).join(", "));
 });

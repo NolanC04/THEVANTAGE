@@ -133,6 +133,32 @@ function Hcos({ uid }: { uid: string }) {
   );
 }
 
+/* 04 Optimization stack (reworded 25 Nov 2026: the middle layer is applied psychology only) */
+function OptimizationStack() {
+  const L: [string, string, string][] = [
+    ["Anthropology", "The study of human behavior across cultures, time and environments.", "Design rituals, shape identity, build commitment, prevent entropy in groups. Status, hierarchy, ritual and meaning all drive performance."],
+    ["Applied psychology (boundary-aware)", "How patterns of thought and behavior form, and how they start working against a person.", "Understand the patterns that hold people back, notice early when something is off, design preventive habits. You do not fix people: you optimize function and know when to refer someone to a qualified professional."],
+    ["Behavioral psychology", "How environment, reinforcement and conditioning shape behavior.", "Habit formation, incentive alignment, stress-response conditioning, performance reinforcement loops. You engineer behavior instead of discussing feelings."],
+  ];
+  const [k, setK] = useState<number | null>(null);
+  const fills = ["f-aus", "f-gs", "f-g"];
+  return (
+    <div className="fw-stage">
+      <svg viewBox="0 0 340 250" role="img" aria-label="Three-layer stack">
+        <text x="170" y="18" textAnchor="middle" fontSize="11" className="t-mu">GROUP · CULTURE</text>
+        {L.map((l, i) => { const y = 30 + i * 70, w = 220 + i * 50, x = 170 - w / 2; return (
+          <g key={l[0]} {...hit(l[0], () => setK(i))}>
+            <rect x={x} y={y} width={w} height="58" className={`${fills[i]} s-g`} strokeWidth={k === i ? 3 : 1} />
+            <text x="170" y={y + 34} textAnchor="middle" fontSize="13" fontWeight="600" className={i === 2 ? "t-on-g" : ""}>{l[0].split(" (")[0]}</text>
+          </g>
+        ); })}
+        <text x="170" y="246" textAnchor="middle" fontSize="11" className="t-mu">INDIVIDUAL · BEHAVIOR</text>
+      </svg>
+      <Read>{k === null ? "Tap a layer to open it." : <><b>{L[k][0]}</b><div>{L[k][1]}</div><p style={{ margin: "10px 0 0" }}><b>Applied:</b> {L[k][2]}</p></>}</Read>
+    </div>
+  );
+}
+
 /* 05 Career types */
 function CareerTypes() {
   const T: [string, string, string][] = [
@@ -665,6 +691,7 @@ export const TOOLS: Record<string, (p: { uid: string }) => ReactNode> = {
   "dome-citadel": DomeCitadel,
   "code-creative-process": CreativeProcess,
   "hcos-radar": Hcos,
+  "optimization-stack": OptimizationStack,
   "career-types": CareerTypes,
   "magnetic-brand-ladder": BrandLadder,
   "content-gps": ContentGps,
