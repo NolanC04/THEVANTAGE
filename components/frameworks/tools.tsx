@@ -1,7 +1,8 @@
 "use client";
 // The 23 working frameworks, as React components. Ported from the Graphics & Frameworks library (22 Nov 2026).
 // State lives in the component only: nothing a learner types is sent anywhere or kept after they leave the page.
-import { useState, type ReactNode, type ChangeEvent } from "react";
+import { type ReactNode, type ChangeEvent } from "react";
+import { useSaved } from "./saved";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 const lines = (s: string) => s.split("\n").map((x) => x.trim()).filter(Boolean);
@@ -24,8 +25,8 @@ function Field({ label, id, children }: { label: string; id: string; children: (
     </div>
   );
 }
-function useFields<T extends Record<string, string>>(init: T) {
-  const [v, setV] = useState(init);
+function useFields<T extends Record<string, string>>(key: string, init: T) {
+  const [v, setV] = useSaved(key, init);
   const bind = (k: keyof T) => ({ value: v[k], onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => setV((o) => ({ ...o, [k]: e.target.value })) });
   return [v, bind, setV] as const;
 }
@@ -41,7 +42,8 @@ function DomeCitadel({ uid }: { uid: string }) {
     ["Keystone", "Your meaning, purpose and why. Pull it and the arch falls."],
     ["Capstone", "Set last. It seals the build into one coherent philosophy."],
   ];
-  const [n, setN] = useState(0);
+  const [n, setN] = useSaved("s1", 0);
+  const [, bind] = useFields("f", { dome: "", c1: "", c2: "", c3: "", c4: "", key: "", cap: "" });
   const op = (i: number) => (i < n ? 1 : 0.15);
   return (
     <div className="fw-stage">
@@ -63,11 +65,11 @@ function DomeCitadel({ uid }: { uid: string }) {
         <Read>{n > 0 && <><b>{steps[n - 1][0]}.</b> {steps[n - 1][1]}</>}</Read>
       </div>
       <div>
-        <Field label="The Dome · what is given" id={`${uid}-dome`}>{(id) => <textarea id={id} className="fw-ta" placeholder="What is true about you that won't change?" />}</Field>
+        <Field label="The Dome · what is given" id={`${uid}-dome`}>{(id) => <textarea id={id} className="fw-ta" placeholder="What is true about you that won't change?" {...bind("dome")} />}</Field>
         <span className="fw-label">Cornerstones · four fundamentals</span>
-        {[1, 2, 3, 4].map((i) => <input key={i} className="fw-in" aria-label={`Cornerstone ${i}`} placeholder={`Cornerstone ${i}`} style={{ marginBottom: 6 }} />)}
-        <Field label="Keystone · your why" id={`${uid}-key`}>{(id) => <input id={id} className="fw-in" placeholder="Pull this and the arch falls" />}</Field>
-        <Field label="Capstone · your philosophy in one line" id={`${uid}-cap`}>{(id) => <input id={id} className="fw-in" placeholder="The line that seals it" />}</Field>
+        {(["c1", "c2", "c3", "c4"] as const).map((k, i) => <input key={k} className="fw-in" aria-label={`Cornerstone ${i + 1}`} placeholder={`Cornerstone ${i + 1}`} style={{ marginBottom: 6 }} {...bind(k)} />)}
+        <Field label="Keystone · your why" id={`${uid}-key`}>{(id) => <input id={id} className="fw-in" placeholder="Pull this and the arch falls" {...bind("key")} />}</Field>
+        <Field label="Capstone · your philosophy in one line" id={`${uid}-cap`}>{(id) => <input id={id} className="fw-in" placeholder="The line that seals it" {...bind("cap")} />}</Field>
       </div>
     </div>
   );
@@ -81,7 +83,8 @@ function CreativeProcess({ uid }: { uid: string }) {
     ["Distill", "Keep your truth sensors on; the good material sticks. Rewrite the note with full context.", "The note, rewritten"],
     ["Express", "The ultimate reason. Make the thing and put it into the world.", "Where will it be expressed, and by when?"],
   ];
-  const [k, setK] = useState(0);
+  const [k, setK] = useSaved("s1", 0);
+  const [notes, setNotes] = useSaved("s2", ["", "", "", ""]);
   return (
     <div>
       <svg viewBox="0 0 640 150" role="img" aria-label="Four stages leading to Express">
@@ -99,7 +102,7 @@ function CreativeProcess({ uid }: { uid: string }) {
       </svg>
       <Read><b>{st[k][0]}.</b> {st[k][1]}</Read>
       <div className="fw-auto" style={{ marginTop: 12 }}>
-        {st.map((s, i) => <Field key={s[0]} label={s[0]} id={`${uid}-c${i}`}>{(id) => <textarea id={id} className="fw-ta" placeholder={s[2]} onFocus={() => setK(i)} />}</Field>)}
+        {st.map((s, i) => <Field key={s[0]} label={s[0]} id={`${uid}-c${i}`}>{(id) => <textarea id={id} className="fw-ta" placeholder={s[2]} onFocus={() => setK(i)} value={notes[i]} onChange={(e) => setNotes((o) => o.map((x, j) => (j === i ? e.target.value : x)))} />}</Field>)}
       </div>
     </div>
   );
@@ -108,7 +111,7 @@ function CreativeProcess({ uid }: { uid: string }) {
 /* 03 HCOS */
 function Hcos({ uid }: { uid: string }) {
   const ax = ["Thinks", "Acts", "Trains", "Recovers", "Decides", "Leads"];
-  const [v, setV] = useState(ax.map(() => 5));
+  const [v, setV] = useSaved("s1", ax.map(() => 5));
   const cx = 170, cy = 160, R = 120;
   const pt = (i: number, r: number) => { const a = -Math.PI / 2 + (i * 2 * Math.PI) / 6; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
   const lo = Math.min(...v), hi = Math.max(...v);
@@ -140,7 +143,7 @@ function OptimizationStack() {
     ["Applied psychology (boundary-aware)", "How patterns of thought and behavior form, and how they start working against a person.", "Understand the patterns that hold people back, notice early when something is off, design preventive habits. You do not fix people: you optimize function and know when to refer someone to a qualified professional."],
     ["Behavioral psychology", "How environment, reinforcement and conditioning shape behavior.", "Habit formation, incentive alignment, stress-response conditioning, performance reinforcement loops. You engineer behavior instead of discussing feelings."],
   ];
-  const [k, setK] = useState<number | null>(null);
+  const [k, setK] = useSaved<number | null>("s1", null);
   const fills = ["f-aus", "f-gs", "f-g"];
   return (
     <div className="fw-stage">
@@ -169,7 +172,7 @@ function CareerTypes() {
     ["Entrepreneur", "Ownership, leverage, systems", "Builds structures that generate value beyond personal labor."],
     ["Investor", "Capital, patience, long-term thinking", "Allocates resources to multiply value over time."],
   ];
-  const [sel, setSel] = useState<number[]>([]);
+  const [sel, setSel] = useSaved<number[]>("s1", []);
   const toggle = (i: number) => setSel((s) => (s.includes(i) ? s.filter((x) => x !== i) : [...(s.length >= 3 ? s.slice(1) : s), i]));
   return (
     <div>
@@ -188,7 +191,7 @@ function CareerTypes() {
 /* 06 Magnetic brand ladder */
 function BrandLadder({ uid }: { uid: string }) {
   const R: [string, string][] = [["Visibility", "Create contact points: posts, videos, interactions."], ["Credibility", "Demonstrate competence: results, testimonials."], ["Connection", "Engage with your audience personally: comments, stories."], ["Trust", "Show reliability and shared values."], ["Conversion", "Align offers with expressed needs."]];
-  const [v, setV] = useState(R.map(() => 3));
+  const [v, setV] = useSaved("s1", R.map(() => 3));
   const b = v.findIndex((x) => x < 3);
   return (
     <div className="fw-stage">
@@ -210,8 +213,8 @@ function BrandLadder({ uid }: { uid: string }) {
 function ContentGps({ uid }: { uid: string }) {
   const W = ["Attraction", "Trust", "Conversion", "Retention"];
   const P = [[80, 88], [250, 112], [420, 68], [590, 104]];
-  const [log, setLog] = useState<{ t: string; c: string; w: number }[]>([]);
-  const [f, bind, setF] = useFields({ t: "", c: "", w: "0" });
+  const [log, setLog] = useSaved<{ t: string; c: string; w: number }[]>("s1", []);
+  const [f, bind, setF] = useFields("f", { t: "", c: "", w: "0" });
   const count = (i: number) => log.filter((p) => p.w === i).length;
   const empty = W.filter((_, i) => !count(i));
   return (
@@ -244,7 +247,7 @@ function ContentGps({ uid }: { uid: string }) {
 /* 08 Founder identity */
 function FounderIdentity({ uid }: { uid: string }) {
   const M = ["Who you were", "What you learned", "How you solve the problem", "Why it matters to them"];
-  const [v, setV] = useState(M.map(() => ""));
+  const [v, setV] = useSaved("s1", M.map(() => ""));
   return (
     <div>
       <div className="fw-stage">
@@ -262,7 +265,7 @@ function FounderIdentity({ uid }: { uid: string }) {
 /* 09 Life-awareness equation */
 function LifeAwareness() {
   const T = ["Life awareness", "+", "Self awareness", "=", "Comprehension", "=", "Narrative + Engagement", "=", "Resilience", "…", "?", "=", "Polymathy", "…", "?", "=", "Sovereignty"];
-  const [n, setN] = useState(1);
+  const [n, setN] = useSaved("s1", 1);
   return (
     <div>
       <div className="fw-eq">
@@ -280,8 +283,10 @@ function LifeAwareness() {
 /* 10 Four domains */
 function FourDomains({ uid }: { uid: string }) {
   const D = ["Influence", "Innovation", "Invention", "Intuition"];
-  const [side, setSide] = useState(D.map(() => "p"));
-  const [pull, setPull] = useState(D.map(() => 3));
+  const [side, setSide] = useSaved("s1", D.map(() => "p"));
+  const [pull, setPull] = useSaved("s2", D.map(() => 3));
+  const [where, setWhere] = useSaved("s3", D.map(() => ""));
+  const [caution, setCaution] = useSaved("s4", D.map(() => ""));
   return (
     <div className="fw-tiles" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))" }}>
       {D.map((d, i) => (
@@ -296,12 +301,12 @@ function FourDomains({ uid }: { uid: string }) {
             <>
               <label className="fw-label" htmlFor={`${uid}-p${i}`}>How strongly is this part of your purpose? {pull[i]}/5</label>
               <Range id={`${uid}-p${i}`} min={1} max={5} value={pull[i]} label={`${d} pull`} onChange={(x) => setPull((o) => o.map((y, j) => (j === i ? x : y)))} />
-              <textarea className="fw-ta" aria-label={`Where you pursue ${d.toLowerCase()} now`} placeholder={`Where you pursue ${d.toLowerCase()} now`} style={{ marginTop: 8 }} />
+              <textarea className="fw-ta" aria-label={`Where you pursue ${d.toLowerCase()} now`} placeholder={`Where you pursue ${d.toLowerCase()} now`} style={{ marginTop: 8 }} value={where[i]} onChange={(e) => setWhere((o) => o.map((x, j) => (j === i ? e.target.value : x)))} />
             </>
           ) : (
             <>
               <label className="fw-label fw-flag" htmlFor={`${uid}-c${i}`}>Where could {d.toLowerCase()} sweep you away?</label>
-              <textarea id={`${uid}-c${i}`} className="fw-ta" placeholder="The way this domain gets used against you" />
+              <textarea id={`${uid}-c${i}`} className="fw-ta" placeholder="The way this domain gets used against you" value={caution[i]} onChange={(e) => setCaution((o) => o.map((x, j) => (j === i ? e.target.value : x)))} />
             </>
           )}
         </div>
@@ -313,7 +318,7 @@ function FourDomains({ uid }: { uid: string }) {
 /* 11 Focus funnel */
 function FocusFunnel({ uid }: { uid: string }) {
   const L: [string, string][] = [["Involvements", "Everything you are part of"], ["Subjects", "What those involvements are about"], ["Concepts", "The ideas underneath the subjects"], ["Values", "What the concepts serve"]];
-  const [v, setV] = useState(L.map(() => ""));
+  const [v, setV] = useSaved("s1", L.map(() => ""));
   const c = v.map(lines);
   const fills = ["f-aus", "f-gs", "f-gs", "f-au"];
   return (
@@ -335,8 +340,8 @@ function FocusFunnel({ uid }: { uid: string }) {
 function VoyagePath({ uid }: { uid: string }) {
   const S = ["Aim", "Launch", "Arrive", "Establish", "Conquer", "Analyze", "Impact", "Create", "Refine", "Repeat"];
   const P = S.map((_, i) => [50 + i * 60, i % 2 ? 70 : 120]);
-  const [at, setAt] = useState<number | null>(null);
-  const [p, setP] = useState("");
+  const [at, setAt] = useSaved<number | null>("s1", null);
+  const [p, setP] = useSaved("s2", "");
   return (
     <div>
       <div style={{ maxWidth: 420 }}><Field label="Current pursuit" id={`${uid}-p`}>{(id) => <input id={id} className="fw-in" placeholder="What are you going after?" value={p} onChange={(e) => setP(e.target.value)} />}</Field></div>
@@ -359,8 +364,8 @@ function VoyagePath({ uid }: { uid: string }) {
 
 /* 13 Goal tree */
 function GoalTree({ uid }: { uid: string }) {
-  const [f, bind] = useFields({ goal: "", ms: "", sys: "", val: "", inc: "" });
-  const [forget, setForget] = useState(false);
+  const [f, bind] = useFields("f", { goal: "", ms: "", sys: "", val: "", inc: "" });
+  const [forget, setForget] = useSaved("s1", false);
   return (
     <div>
       <div className="fw-stage">
@@ -390,8 +395,8 @@ function GoalTree({ uid }: { uid: string }) {
 
 /* 14 Personal operating system */
 function PersonalOs({ uid }: { uid: string }) {
-  const [h, setH] = useState(["", "", ""]);
-  const [f, bind] = useFields({ smart: "", ms: "", str: "", tac: "" });
+  const [h, setH] = useSaved("s1", ["", "", ""]);
+  const [f, bind] = useFields("f", { smart: "", ms: "", str: "", tac: "" });
   const names = ["20", "10", "5"];
   const miss = names.filter((_, i) => !h[i].trim());
   const any = h.some((x) => x.trim()) || f.tac.trim();
@@ -425,7 +430,7 @@ function PersonalOs({ uid }: { uid: string }) {
 /* 15 Type B day / Type A life */
 function TypeBTypeA() {
   const Q: Record<string, string> = { "0,0": "Rigid day, drifting life: tight schedules with no ruthless vision behind them.", "1,0": "Flexible day, drifting life: adaptive, but nothing is being built.", "0,1": "Rigid day, ruthless life: the vision is right, but the day is brittle and breaks under friction.", "1,1": "Flexible day, ruthless life. This is the target." };
-  const [dot, setDot] = useState<[number, number] | null>(null);
+  const [dot, setDot] = useSaved<[number, number] | null>("s1", null);
   const place = (x: number, y: number) => setDot([Math.max(40, Math.min(300, x)), Math.max(20, Math.min(280, y))]);
   const cells: [number, number, string][] = [[105, 85, "Rigid day, ruthless life"], [235, 85, "Flexible day, ruthless life"], [105, 215, "Rigid day, drifting life"], [235, 215, "Flexible day, drifting life"]];
   return (
@@ -450,7 +455,7 @@ function TypeBTypeA() {
 /* 16 Funding chain */
 function FundingChain({ uid }: { uid: string }) {
   const S = ["Earn money", "Fund the work", "Develop the assets", "Fuel the purpose and passion", "Build the vision"];
-  const [v, setV] = useState(S.map(() => ""));
+  const [v, setV] = useSaved("s1", S.map(() => ""));
   const b = v.findIndex((t) => !t.trim());
   const split = (s: string) => (s.length > 18 ? [s.split(" the ")[0] + " the", s.split(" the ")[1]] : [s]);
   return (
@@ -471,8 +476,8 @@ function FundingChain({ uid }: { uid: string }) {
 /* 17 Management 3C */
 function Management3c({ uid }: { uid: string }) {
   const Q: [string, string, string][] = [["Competence", "Do they have the skill?", "Train it."], ["Context", "Do they have the information?", "Deliver it."], ["Conscientiousness", "Do they care about the outcome?", "You will always need management here."]];
-  const [a, setA] = useState<(boolean | null)[]>([null, null, null]);
-  const [who, setWho] = useState("");
+  const [a, setA] = useSaved<(boolean | null)[]>("s1", [null, null, null]);
+  const [who, setWho] = useSaved("s2", "");
   const w = who.trim() || "They";
   const s = w === "They" ? "" : "s";
   const miss = Q.filter((_, i) => a[i] === false);
@@ -492,8 +497,8 @@ function Management3c({ uid }: { uid: string }) {
 
 /* 18 Velocity */
 function Velocity({ uid }: { uid: string }) {
-  const [p, setP] = useState(5);
-  const [t, setT] = useState(5);
+  const [p, setP] = useSaved("s1", 5);
+  const [t, setT] = useSaved("s2", 5);
   return (
     <div>
       <div className="fw-stage">
@@ -520,7 +525,7 @@ function Velocity({ uid }: { uid: string }) {
 
 /* 19 Versatilist */
 function Versatilist({ uid }: { uid: string }) {
-  const [d, setD] = useState<[string, number][]>([["", 60], ["", 60], ["", 60]]);
+  const [d, setD] = useSaved<[string, number][]>("s1", [["", 60], ["", 60], ["", 60]]);
   const w = 300 / d.length;
   const at = d.filter((x) => x[1] >= 60).length;
   const set = (i: number, x: [string, number]) => setD((o) => o.map((y, j) => (j === i ? x : y)));
@@ -552,8 +557,8 @@ function Versatilist({ uid }: { uid: string }) {
 function EfficacyStandard({ uid }: { uid: string }) {
   const T: [string, string][] = [["Output", "Did the target outcome improve, measurably?"], ["Cost", "What did it cost: money, time, freedom, cohesion?"], ["Externalities", "Who paid the hidden bill? What harm landed downstream?"], ["Resilience", "Does it keep working under stress and variance?"], ["Reversibility", "Can we roll it back if it fails, or is it sticky?"]];
   const V = ["Passes", "Fails", "Unknown"];
-  const [a, setA] = useState<(string | null)[]>(T.map(() => null));
-  const [dec, setDec] = useState("");
+  const [a, setA] = useSaved<(string | null)[]>("s1", T.map(() => null));
+  const [dec, setDec] = useSaved("s2", "");
   const d = dec.trim() || "This";
   const f = T.filter((_, i) => a[i] === "Fails").map((t) => t[0]);
   const u = T.filter((_, i) => a[i] === "Unknown").map((t) => t[0]);
@@ -571,7 +576,7 @@ function EfficacyStandard({ uid }: { uid: string }) {
 /* 21 Paired contrasts */
 function PairedContrasts({ uid }: { uid: string }) {
   const P = [["Human doing", "Human being"], ["Accomplishment", "Success"], ["Wealth", "Wisdom"]];
-  const [v, setV] = useState([0, 0, 0]);
+  const [v, setV] = useSaved("s1", [0, 0, 0]);
   const lean = P.map((p, i) => (v[i] < 0 ? p[0] : v[i] > 0 ? p[1] : null)).filter(Boolean);
   return (
     <div>
@@ -595,11 +600,13 @@ function PairedContrasts({ uid }: { uid: string }) {
 
 /* 22 House of rooms */
 function IdentityHouse({ uid }: { uid: string }) {
-  const [R, setR] = useState<{ n: string; w: number; burn: boolean }[]>([]);
-  const [name, setName] = useState("");
-  const [wt, setWt] = useState("2");
-  const [msg, setMsg] = useState<ReactNode>(null);
+  const [R, setR] = useSaved<{ n: string; w: number; burn: boolean }[]>("s1", []);
+  const [name, setName] = useSaved("s2", "");
+  const [wt, setWt] = useSaved("s3", "2");
   const tot = R.reduce((s, r) => s + r.w, 0) || 1;
+  const big = R.find((r) => r.burn);
+  const left = big ? Math.round((100 * (tot - big.w)) / tot) : 0;
+  const msg: ReactNode = big ? <><b>{big.n}</b> burns. {left}% of the house still stands.{R.length === 1 ? " A single-room identity is lost." : left < 50 ? " Most of the self lived in one room; build the others." : ""} If that disappeared, would you no longer be?</> : null;
   let x = 30;
   return (
     <div className="fw-stage">
@@ -612,19 +619,17 @@ function IdentityHouse({ uid }: { uid: string }) {
       </svg>
       <div>
         <label className="fw-label" htmlFor={`${uid}-n`}>Add a room</label>
-        <form style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "end" }} onSubmit={(e) => { e.preventDefault(); const n = name.trim(); if (!n || R.length >= 8) return; setR((o) => [...o.map((r) => ({ ...r, burn: false })), { n, w: Number(wt), burn: false }]); setName(""); setMsg(null); }}>
+        <form style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "end" }} onSubmit={(e) => { e.preventDefault(); const n = name.trim(); if (!n || R.length >= 8) return; setR((o) => [...o.map((r) => ({ ...r, burn: false })), { n, w: Number(wt), burn: false }]); setName(""); }}>
           <input id={`${uid}-n`} className="fw-in" style={{ flex: 2, minWidth: 140 }} placeholder="e.g. Husband, Builder, Athlete" value={name} onChange={(e) => setName(e.target.value)} />
           <select className="fw-sel" style={{ flex: 1, minWidth: 110 }} aria-label="Size of the room" value={wt} onChange={(e) => setWt(e.target.value)}><option value="1">Small</option><option value="2">Medium</option><option value="3">Large</option></select>
           <button type="submit" className="fw-btn">Add</button>
         </form>
         <div className="fw-row">
           <button type="button" className="fw-btn" disabled={!R.length} onClick={() => {
-            const big = R.reduce((a, b) => (b.w > a.w ? b : a));
-            const all = R.reduce((s, r) => s + r.w, 0), left = Math.round((100 * (all - big.w)) / all);
-            setR((o) => o.map((r) => ({ ...r, burn: r === big })));
-            setMsg(<><b>{big.n}</b> burns. {left}% of the house still stands.{R.length === 1 ? " A single-room identity is lost." : left < 50 ? " Most of the self lived in one room; build the others." : ""} If that disappeared, would you no longer be?</>);
+            const top = R.reduce((a, b) => (b.w > a.w ? b : a));
+            setR((o) => o.map((r) => ({ ...r, burn: r === top })));
           }}>Fire test</button>
-          <button type="button" className="fw-btn-line" onClick={() => { setR((o) => o.map((r) => ({ ...r, burn: false }))); setMsg(null); }}>Rebuild</button>
+          <button type="button" className="fw-btn-line" onClick={() => setR((o) => o.map((r) => ({ ...r, burn: false })))}>Rebuild</button>
         </div>
         <Read>{msg}</Read>
       </div>
@@ -634,7 +639,7 @@ function IdentityHouse({ uid }: { uid: string }) {
 
 /* 23 Humor bridge */
 function HumorBridge({ uid }: { uid: string }) {
-  const [f, bind] = useFields({ a: "", c: "", b: "" });
+  const [f, bind] = useFields("f", { a: "", c: "", b: "" });
   return (
     <div>
       <svg viewBox="0 0 640 170" role="img" aria-label="Two islands joined by a bridge">
@@ -663,8 +668,8 @@ function EvidenceLadder({ uid }: { uid: string }) {
     "Separate “is” from “ought”: empirical claims say “evidence suggests”; normative claims say “arguably” or “this implies.”",
     "Hedge once, then commit. Stacked hedges read as evasion.",
   ];
-  const [k, setK] = useState(4);
-  const [f, bind] = useFields({ s: "The data", o: "that structure beats willpower" });
+  const [k, setK] = useSaved("s1", 4);
+  const [f, bind] = useFields("f", { s: "The data", o: "that structure beats willpower" });
   return (
     <div className="fw-stage">
       <svg viewBox="0 0 280 300" role="img" aria-label="Six-rung evidence ladder">

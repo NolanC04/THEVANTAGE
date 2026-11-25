@@ -4,17 +4,19 @@ import { reflectionFor } from "@/lib/airman/reflection";
 import { PHASES, code, phaseOf } from "@/lib/airman/program";
 import { Painting } from "@/components/airman/Painting";
 import { AlmanacTools, ShareToggle, Reflection } from "./Tools";
+import { airmanFrameworkEntries } from "@/lib/frameworks/entries";
+import { frameworkById } from "@/lib/frameworks/registry";
 
 export default async function Almanac() {
   const p = (await currentProfile())!;
-  const [entries, mods, reflection] = await Promise.all([entriesOf(p.id), modules(), reflectionFor(p.id)]);
+  const [entries, mods, reflection, frameworks] = await Promise.all([entriesOf(p.id), modules(), reflectionFor(p.id), airmanFrameworkEntries(p.id)]);
   const sealed = entries.filter((e) => e.sealed_at);
   const title = (n: number) => mods.find((m) => m.number === n)?.content.title ?? code(n);
   const painting = (n: number) => mods.find((m) => m.number === n)?.image_url ?? null;
   return (
     <main className="page" style={{ display: "grid", gap: 14 }}>
       <h1 style={{ fontSize: 22, margin: "8px 0 0" }}>Your Almanac</h1>
-      <p className="help" style={{ margin: 0 }}>Only you read this. A facilitator sees an entry only if you share it. {sealed.length} of 24 sealed.</p>
+      <p className="help" style={{ margin: 0 }}>Only you read this. A facilitator sees an entry only if you share it. {sealed.length} of {mods.length} sealed.</p>
       {reflection && <Reflection id={reflection.id} text={reflection.text} />}
       {PHASES.map((ph) => {
         const list = sealed.filter((e) => phaseOf(e.module_number).key === ph.key);
@@ -40,6 +42,23 @@ export default async function Almanac() {
         );
       })}
       {!sealed.length && <p className="card">Nothing sealed yet. Each module you seal lands here.</p>}
+      {frameworks.length > 0 && (
+        <section style={{ display: "grid", gap: 10 }}>
+          <h2 style={{ fontSize: 16, margin: "8px 0 0" }}>Practice you saved</h2>
+          {frameworks.map((e) => {
+            const f = frameworkById(e.framework_id);
+            if (!f) return null;
+            return (
+              <article key={e.framework_id} className="card" style={{ display: "grid", gap: 6 }}>
+                <div className="k">{e.module_number ? `${code(e.module_number)} · ` : ""}saved {new Date(e.saved_at).toLocaleDateString()}</div>
+                <a className="serif" style={{ fontSize: 18 }} href={e.module_number ? `/airman/app/m/${e.module_number}#${f.id}` : "#"}>{f.title}</a>
+                {e.summary && <p style={{ margin: 0 }}>{e.summary}</p>}
+              </article>
+            );
+          })}
+          <p className="help" style={{ margin: 0 }}>Saved practice stays private to you. It is never shared with a facilitator.</p>
+        </section>
+      )}
       <AlmanacTools />
     </main>
   );

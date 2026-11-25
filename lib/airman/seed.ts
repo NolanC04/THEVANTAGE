@@ -41,6 +41,7 @@ export function seedData() {
     class_sessions: [],
     class_joins: [],
     module_entries: [],
+    framework_entries: [],
     observations: [],
     daily_reps: [],
     checkins: [],

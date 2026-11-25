@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     const reads = await db.list<{ id: string }>("gene_reads", { user_id: p.id });
     for (const r of reads) await db.remove("rater_scores", { read_id: r.id });
     await db.remove("gene_reads", { user_id: p.id });
-    await Promise.all([db.remove("module_entries", { user_id: p.id }), db.remove("daily_reps", { user_id: p.id }), db.remove("observations", { user_id: p.id })]);
+    await Promise.all([db.remove("module_entries", { user_id: p.id }), db.remove("daily_reps", { user_id: p.id }), db.remove("observations", { user_id: p.id }), db.remove("framework_entries", { user_id: p.id })]);
     await db.insert("audit_log", { actor_id: p.id, actor_anon: p.anon_id, action: "almanac.deleted", target: p.id, detail: {}, at: new Date().toISOString() });
     return ok();
   } catch (e) {

@@ -3,12 +3,14 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { currentMember } from "@/lib/auth";
 import { hasPaidAccess, moduleGate } from "@/lib/access";
-import { programBySlug, tracklist, purchasesOf, currentCohort, seatsTaken } from "@/lib/content";
+import { programBySlug, publishedPrograms, tracklist, purchasesOf, currentCohort, seatsTaken } from "@/lib/content";
 import { store } from "@/lib/store";
 import { phaseFor } from "@/lib/seed";
 import type { AlmanacEntry, DomeRow } from "@/lib/types";
 import { DomeEditor } from "@/components/DomeEditor";
 import { PostButton } from "@/components/PostButton";
+import { memberFrameworkEntries } from "@/lib/frameworks/entries";
+import { frameworkById } from "@/lib/frameworks/registry";
 
 export const metadata: Metadata = { title: "Your library", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -20,14 +22,32 @@ export default async function Account() {
   if (!member) redirect("/begin?next=/account");
   const db = store();
   const program = await programBySlug("aapex");
-  const [tracks, sealed, domeRow, purchases, cohort] = await Promise.all([
+  const [tracks, sealed, domeRow, purchases, cohort, frameworks] = await Promise.all([
     program ? tracklist(program.id) : Promise.resolve([]),
     // Almanac: only the signed-in member's own entries (RLS enforces the same on direct API access).
     db.list<AlmanacEntry>("almanac_entries", { member_id: member.id }),
     db.get<DomeRow>("dome", { member_id: member.id }),
     purchasesOf(member.id),
     currentCohort(),
+    memberFrameworkEntries(member.id),
   ]);
+  // The Almanac grows with what Studiolo publishes: one shelf per published program, sized by its published module count.
+  // A program appears once the member can open one of its modules or has sealed one; AAPEX (the flagship) always appears.
+  const programs = await publishedPrograms();
+  const shelves = (
+    await Promise.all(
+      programs.map(async (pr) => {
+        const mods = pr.slug === "aapex" ? tracks : await tracklist(pr.id);
+        const done = new Set(sealed.filter((s) => s.program_slug === pr.slug).map((s) => s.module_number));
+        const next = mods.find((t) => !done.has(t.number) && moduleGate(member, pr, t).open) ?? null;
+        const show = mods.length > 0 && (pr.slug === "aapex" || done.size > 0 || next !== null);
+        return show ? { program: pr, mods, done, next } : null;
+      }),
+    )
+  ).filter((x) => x !== null).sort((a, b) => (a.program.slug === "aapex" ? -1 : b.program.slug === "aapex" ? 1 : 0));
+  const wordOf = (slug: string) => programs.find((p) => p.slug === slug)?.word ?? slug;
+  const totalModules = shelves.reduce((n, s) => n + s.mods.length, 0);
+  const totalSealed = shelves.reduce((n, s) => n + s.done.size, 0);
   const seats = cohort ? cohort.seats - (await seatsTaken(cohort.id)) : 0;
   const sealedSet = new Set(sealed.filter((s) => s.program_slug === "aapex").map((s) => s.module_number));
   const current = tracks.find((t) => !sealedSet.has(t.number) && program && moduleGate(member, program, t).open) ?? null;
@@ -77,33 +97,62 @@ export default async function Account() {
         <section id="almanac" aria-labelledby="alm-h" className="px-5 md:px-[72px] py-20 md:py-[120px]">
           <div className="rule-top pt-7 flex flex-wrap items-baseline justify-between gap-4">
             <h2 id="alm-h" className="h2-sm">My Almanac</h2>
-            <p className="m-0 text-[14px]" style={{ color: "var(--color-muted)" }}>{sealedSet.size} of {tracks.length} modules sealed</p>
+            <p className="m-0 text-[14px]" style={{ color: "var(--color-muted)" }}>{totalSealed} of {totalModules} modules sealed{shelves.length > 1 ? ` across ${shelves.length} programs` : ""}</p>
           </div>
-          <div className="grid gap-3 mt-10" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(120px, 30%), 1fr))" }}>
-            {tracks.map((t) =>
-              sealedSet.has(t.number) && t.cover_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img key={t.id} src={t.cover_url} alt={`Module ${t.number} sealed`} className="aspect-[4/3] w-full object-cover" />
-              ) : sealedSet.has(t.number) ? (
-                <div key={t.id} className="aspect-[4/3] flex items-center justify-center title text-[28px]" style={{ background: "var(--color-surface)", color: "var(--color-gold)" }}>I</div>
-              ) : current?.number === t.number ? (
-                <div key={t.id} className="aspect-[4/3] flex items-center justify-center border border-[var(--color-gold)] text-[12px] tracking-[.2em]" style={{ color: "var(--color-gold)" }}>{t.number} · NOW</div>
-              ) : (
-                <div key={t.id} className="aspect-[4/3] flex items-center justify-center border border-[var(--color-rule)] text-[13px]" style={{ color: "var(--color-dim)" }}>{t.number}</div>
-              ),
-            )}
-          </div>
+          {shelves.map(({ program: pr, mods, done, next }) => (
+            <div key={pr.id} className="mt-10">
+              {shelves.length > 1 && (
+                <p className="eyebrow flex flex-wrap justify-between gap-3">
+                  <span>{pr.word}</span>
+                  <span style={{ color: "var(--color-muted)" }}>{done.size} of {mods.length}</span>
+                </p>
+              )}
+              <div className="grid gap-3 mt-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(120px, 30%), 1fr))" }}>
+                {mods.map((t) =>
+                  done.has(t.number) && t.cover_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img key={t.id} src={t.cover_url} alt={`${pr.word} module ${t.number} sealed`} className="aspect-[4/3] w-full object-cover" />
+                  ) : done.has(t.number) ? (
+                    <div key={t.id} className="aspect-[4/3] flex items-center justify-center title text-[28px]" style={{ background: "var(--color-surface)", color: "var(--color-gold)" }}>I</div>
+                  ) : next?.number === t.number ? (
+                    <Link key={t.id} href={`/programs/${pr.slug}/${t.number}`} className="aspect-[4/3] flex items-center justify-center border border-[var(--color-gold)] text-[12px] tracking-[.2em] no-underline" style={{ color: "var(--color-gold)" }}>{t.number} · NOW</Link>
+                  ) : (
+                    <div key={t.id} className="aspect-[4/3] flex items-center justify-center border border-[var(--color-rule)] text-[13px]" style={{ color: "var(--color-dim)" }}>{t.number}</div>
+                  ),
+                )}
+              </div>
+            </div>
+          ))}
           {sealed.length > 0 && (
             <ol className="mt-14 p-0 list-none">
-              {sealed.sort((a, b) => a.module_number - b.module_number).map((s) => (
+              {sealed.sort((a, b) => a.program_slug.localeCompare(b.program_slug) || a.module_number - b.module_number).map((s) => (
                 <li key={s.id} className="rule-top py-6">
-                  <p className="eyebrow text-[11px]">Module {s.module_number} · sealed {new Date(s.sealed_at).toLocaleDateString()}</p>
+                  <p className="eyebrow text-[11px]">{shelves.length > 1 ? `${wordOf(s.program_slug)} · ` : ""}Module {s.module_number} · sealed {new Date(s.sealed_at).toLocaleDateString()}</p>
                   <p className="title text-[22px] mt-3 mb-0">{s.question}</p>
                   <p className="body mt-2 mb-0 text-[15px]">{s.answer}</p>
                   <p className="mt-3 mb-0 pl-4 border-l border-[var(--color-gold)] text-[15px]">{s.gene_reply}</p>
                 </li>
               ))}
             </ol>
+          )}
+          {frameworks.length > 0 && (
+            <div className="mt-14">
+              <p className="eyebrow">Frameworks you&apos;ve worked</p>
+              <ol className="mt-4 p-0 list-none">
+                {frameworks.map((e) => {
+                  const f = frameworkById(e.framework_id);
+                  if (!f) return null;
+                  const href = e.module_number ? `/programs/aapex/${e.module_number}#${f.id}` : `/library/frameworks/${f.id}`;
+                  return (
+                    <li key={e.framework_id} className="rule-top py-6">
+                      <p className="eyebrow text-[11px]">{e.module_number ? `Module ${e.module_number} · ` : ""}saved {new Date(e.saved_at).toLocaleDateString()}</p>
+                      <p className="title text-[22px] mt-3 mb-0"><Link href={href} className="no-underline" style={{ color: "var(--color-text)" }}>{f.title}</Link></p>
+                      {e.summary && <p className="body mt-2 mb-0 text-[15px]">{e.summary}</p>}
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
           )}
           <p className="mt-8 text-[13px]" style={{ color: "var(--color-dim)" }}>Your Almanac is private. No one else can read it.</p>
         </section>

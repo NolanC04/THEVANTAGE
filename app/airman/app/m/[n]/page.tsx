@@ -8,11 +8,14 @@ import { code, phaseOf, sessionOf, LEARNER_FIELDS, type ModuleContent } from "@/
 import { Player } from "./Player";
 import { FrameworkShelf } from "@/components/frameworks/FrameworkCard";
 import { frameworksForModule } from "@/lib/frameworks/registry";
+import { airmanSaved } from "@/lib/frameworks/entries";
 
 export default async function ModulePage({ params }: { params: Promise<{ n: string }> }) {
   const n = Number((await params).n);
   if (!Number.isInteger(n) || n < 1 || n > 24) notFound();
   const p = (await currentProfile())!;
+  const practiceFw = frameworksForModule(n, isAdmin(p));
+  const savedFw = practiceFw.length ? await airmanSaved(p.id) : {};
   const m = await moduleRow(n);
   if (!m) notFound();
   if (!(await canRead(p, n)))
@@ -39,7 +42,7 @@ export default async function ModulePage({ params }: { params: Promise<{ n: stri
       content={learner}
       entry={{ bridge: entry.bridge, bridge_at: entry.bridge_at, remix: entry.remix, quick_check: entry.quick_check, gene: entry.gene, sealed_at: entry.sealed_at, shared: entry.shared }}
       closingLaw={law?.approved ? law.text : null}
-      practice={<FrameworkShelf frameworks={frameworksForModule(n, isAdmin(p))} admin={isAdmin(p)} eyebrowClass="k" title="PRACTICE · ON YOUR OWN" />}
+      practice={<FrameworkShelf frameworks={practiceFw} admin={isAdmin(p)} eyebrowClass="k" title="PRACTICE · ON YOUR OWN" saved={savedFw} save={{ endpoint: "/api/airman/frameworks/save", moduleNumber: n }} />}
     />
   );
 }

@@ -17,7 +17,7 @@ export type TableName =
   | "modules" | "closing_laws" | "import_proposals"
   | "classes" | "class_members" | "class_sessions" | "class_joins"
   | "module_entries" | "observations" | "daily_reps" | "checkins" | "safety_flags"
-  | "gene_reads" | "rater_scores";
+  | "gene_reads" | "rater_scores" | "framework_entries";
 type Row = Record<string, unknown>;
 type Match = Record<string, string | number | boolean | null>;
 
