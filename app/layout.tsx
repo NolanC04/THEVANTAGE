@@ -1,8 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { Nav } from "@/components/Nav";
-import { Footer } from "@/components/Footer";
-import { currentMember } from "@/lib/auth";
 import { env } from "@/lib/env";
 
 export const metadata: Metadata = {
@@ -13,13 +10,7 @@ export const metadata: Metadata = {
 };
 export const viewport: Viewport = { themeColor: "#0D0B08", width: "device-width", initialScale: 1 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  let signedIn = false;
-  try {
-    signedIn = Boolean(await currentMember());
-  } catch {
-    signedIn = false; // nav still renders; protected pages surface their own errors
-  }
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
@@ -32,10 +23,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
       </head>
       <body>
-        <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:p-4">Skip to content</a>
-        <Nav signedIn={signedIn} />
-        <main id="main">{children}</main>
-        <Footer />
+        {children}
       </body>
     </html>
   );

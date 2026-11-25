@@ -38,6 +38,17 @@ export default async function Military({ searchParams }: { searchParams: Promise
           <a className="btn-gold" href="/api/verify/idme/start">{sp.error ? "Retry with ID.me" : "Verify with ID.me"}</a>
         )}
       </div>
+      <div className="rule-top mt-16 pt-12">
+        <p className="eyebrow">Live cohorts</p>
+        <h2 className="h2-sm mt-6">Work through AAPEX with a facilitator and a small group.</h2>
+        <p className="body mt-6">
+          Eight four-hour sessions across a year, voluntary and off duty, with a private Almanac that stays yours.
+          Cohorts are joined by invite code from your facilitator. Nothing in a cohort is sold.
+        </p>
+        <div className="mt-8">
+          <Link className="btn-line" href="/airman">Enter with an invite code</Link>
+        </div>
+      </div>
       <p className="mt-12 text-[13px]" style={{ color: "var(--color-dim)" }}>
         The Vantage is an independent educational program. Service is mentioned as plain fact; nothing here implies endorsement by the Department of Defense or any branch.
       </p>

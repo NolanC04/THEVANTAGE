@@ -16,6 +16,16 @@ Read `.github/copilot-instructions.md` (project context), `.github/instructions/
 - The Almanac is private to the member (RLS: owner only, no facilitator/admin policy).
 - Locked prompts live in NolanC04/SIGNETOPS. GENE's prompt is fetched at runtime (`lib/model-door.ts`); never copy prompt text here.
 
+## The Airman Vantage (`/airman`, internal name)
+
+The facilitated, free military segment, merged from the Airman Apex repo on 24 Nov 2026. The March 2027 pilot cohort runs here. Publicly it is labelled **Military and veterans**; "The Airman Vantage" is never shown to members.
+
+- Code: `app/airman`, `app/api/airman`, `lib/airman`, `components/airman`, `scripts/airman`, `tests/airman`. Docs: `docs/airman/` (its own design tokens, build phases and pilot content). Read `docs/airman/copilot-instructions.md` before changing it.
+- Its own shell: parchment theme scoped to `.airman` (`app/airman/airman.css`); The Vantage's nav, prices and footer live in `app/(site)/layout.tsx` and never render inside the segment. **No paid offer, price, checkout or upsell inside `/airman`.**
+- Shared database, separate tables: every segment table is `airman_*` (`lib/airman/store.ts` adds the prefix). One Supabase login; segment roles live in `airman_profiles`, apart from The Vantage's `members`.
+- Its rules still hold inside the segment: Almanac private to the owner, class wall and Bridge gate on the server and in RLS, feedback anonymous below 5 responses, Military Crisis Line on request screens, GENE validation (`gene_reads`, blind raters at `/airman/rate`), no unit tooling (that lives in NolanC04/UNITTOOLS).
+- Pilot data is research data: never copy `airman_*` rows into The Vantage's civilian tables or reports.
+
 ## Code map
 
 | Path | What |

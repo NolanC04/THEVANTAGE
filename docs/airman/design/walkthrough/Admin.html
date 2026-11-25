@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Airman AAPEX · Admin version</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&amp;family=EB+Garamond:ital,wght@0,400;0,500;1,400&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F3A2E}a:hover{color:#141413}
+.ad-tab{display:flex;align-items:center;min-height:44px;width:100%;border:0;border-radius:10px;background:transparent;color:#2B2B27;font:500 14px Inter,system-ui,sans-serif;text-align:left;padding:0 12px;cursor:pointer;text-decoration:none;box-sizing:border-box}
+.ad-btn{min-height:44px;border:0;border-radius:10px;background:#1F3A2E;color:#F7F2E8;font:600 14px Inter,system-ui,sans-serif;cursor:pointer;padding:0 16px}
+.ad-btn:disabled{background:#B8B2A4;color:#4A4A44;cursor:not-allowed}
+.ad-ghost{min-height:44px;border:1px solid #1F3A2E;border-radius:10px;background:transparent;color:#1F3A2E;font:600 14px Inter,system-ui,sans-serif;cursor:pointer;padding:0 14px}
+.ad-card{background:#F7F2E8;border:1px solid #D6CCB8;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.ad-h{font:700 20px Cinzel,serif;color:#1F3A2E;margin:0}
+.ad-k{font:600 12px Inter,sans-serif;letter-spacing:1.5px;color:#4A4A44}
+.ad-in{box-sizing:border-box;width:100%;min-height:44px;padding:10px 12px;border:1px solid #BFB39C;border-radius:10px;background:#FBF8F2;font:15px Inter,sans-serif;color:#141413}
+.ad-lab{display:flex;flex-direction:column;gap:6px;font:600 13px Inter,sans-serif;color:#2B2B27}
+.ad-mod{min-height:44px;border-radius:10px;font:600 13px Inter,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:0 12px}
+.ad-td{padding:8px;border-bottom:1px solid #E3DACA;font-size:14px}
+.ad-th{padding:10px 8px;border-bottom:1px solid #D6CCB8;text-align:left;color:#4A4A44;font:600 12px Inter,sans-serif;letter-spacing:1px}
+.ad-role{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border-radius:20px;border:1px solid #F7F2E8;background:transparent;color:#F7F2E8;font:600 13px Inter,sans-serif;cursor:pointer}
+.ad-role-item{display:flex;align-items:center;justify-content:space-between;min-height:44px;padding:0 14px;color:#141413;text-decoration:none;font:500 14px Inter,sans-serif}
+.ad-role-item:hover{background:#EEE7D8;color:#141413}
+</style>
+</helmet>
+<div style="min-height: 1040px; box-sizing: border-box; background: #EEE7D8; color: #141413; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column">
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 28px; background: #141413; color: #F7F2E8">
+<div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap">
+<div style="font-family: Cinzel, serif; font-weight: 700; font-size: 20px; letter-spacing: 4px">AAPEX</div>
+<span style="font-size: 11px; font-weight: 600; letter-spacing: 2px; background: #F7F2E8; color: #141413; border-radius: 6px; padding: 4px 8px">ADMIN VERSION</span>
+</div>
+<div style="position: relative">
+<button class="ad-role" onClick="{{ toggleRole }}" aria-expanded="{{ roleExpanded }}" aria-haspopup="true">View: Admin<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
+<sc-if value="{{ roleOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; right: 0; top: 48px; width: 220px; background: #FBF8F2; border: 1px solid #BFB39C; border-radius: 12px; overflow: hidden; z-index: 5; box-shadow: 0 8px 24px rgba(20,20,19,0.2)">
+<a class="ad-role-item" href="Facilitator.dc.html">Facilitator</a>
+<a class="ad-role-item" href="Learner-Modules.dc.html">Learner</a>
+<a class="ad-role-item" href="Admin.dc.html" aria-current="page" style="font-weight: 600">Admin<span aria-hidden="true">✓</span></a>
+</div>
+</sc-if>
+</div>
+</header>
+<div style="flex: 1; display: flex; flex-wrap: wrap; gap: 24px; padding: 24px 28px; align-items: flex-start">
+<nav aria-label="Admin" style="flex: 1 1 200px; max-width: 240px; display: flex; flex-direction: column; gap: 4px">
+<button class="ad-tab" onClick="{{ tabMaterial }}" style="background: {{ matBg }}; color: {{ matFg }}">Material</button>
+<button class="ad-tab" onClick="{{ tabAccess }}" style="background: {{ accBg }}; color: {{ accFg }}">Access</button>
+<a class="ad-tab" href="Facilitator.dc.html">Classes, work &amp; people ↗</a>
+<div style="font-size: 12px; line-height: 1.5; color: #4A4A44; padding: 12px">Admins can do everything a facilitator can. Those tools live in the Facilitator view.</div>
+</nav>
+<main style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+
+<sc-if value="{{ isMaterial }}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<div class="ad-card" style="flex: 1 1 220px; max-width: 260px; padding: 14px; gap: 6px">
+<div class="ad-k" style="padding: 4px 4px 6px">MODULES</div>
+<sc-for list="{{ modList }}" as="m" hint-placeholder-count="24">
+<button class="ad-mod" onClick="{{ m.pick }}" style="background: {{ m.bg }}; color: {{ m.fg }}; border: {{ m.border }}"><span>{{ m.code }}</span><span style="font-size: 11px; font-weight: 500">{{ m.status }}</span></button>
+</sc-for>
+</div>
+<div style="flex: 999 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+<div class="ad-card">
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px"><h1 class="ad-h">{{ code }} · {{ phaseName }}</h1><span class="ad-k">{{ statusLabel }}</span></div>
+<div style="font-size: 13px; color: #4A4A44">Source file: {{ path }}</div>
+<label class="ad-lab">Title<input class="ad-in" value="{{ f.title }}" onChange="{{ on.title }}" placeholder="[Module title]"></label>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px">
+<label class="ad-lab">Focus skill<input class="ad-in" value="{{ f.focus }}" onChange="{{ on.focus }}" placeholder="The one skill this module practices"></label>
+<div class="ad-lab">Unit outcome (5 C's)<div style="display: flex; gap: 8px"><button class="ad-ghost" onClick="{{ cycleC }}" style="min-width: 130px">{{ cName }}</button><input class="ad-in" value="{{ f.outcome }}" onChange="{{ on.outcome }}" placeholder="What this does for the unit"></div></div>
+</div>
+<label class="ad-lab">Daily rep prompt<textarea class="ad-in" rows="2" value="{{ f.daily }}" onChange="{{ on.daily }}" placeholder="A two-minute practice between sessions"></textarea></label>
+<label class="ad-lab">Facilitator opener (facilitator-only, never shown to learners)<textarea class="ad-in" rows="2" value="{{ f.opener }}" onChange="{{ on.opener }}" placeholder="Your own short story that opens the module"></textarea></label>
+<label class="ad-lab">Role-play scenario<textarea class="ad-in" rows="2" value="{{ f.scenario }}" onChange="{{ on.scenario }}" placeholder="Contact persona · opening hook · 3 decision beats · how it resolves"></textarea></label>
+<label class="ad-lab">Closing Law · Nolan writes this; AI may not author it<textarea class="ad-in" rows="2" value="{{ f.law }}" onChange="{{ on.law }}" placeholder="In your own words"></textarea></label>
+</div>
+
+<div class="ad-card">
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px"><h2 class="ad-h" style="font-size: 17px">Slides and the activities they call</h2><span style="font-size: 13px; color: #4A4A44">{{ slideCount }} slides · tap a cell to change it</span></div>
+<div style="overflow-x: auto">
+<table style="width: 100%; border-collapse: collapse; min-width: 560px">
+<thead><tr><th class="ad-th">#</th><th class="ad-th">SCREEN</th><th class="ad-th">ACTIVITY BELOW THE SLIDE</th><th class="ad-th">IMAGE</th></tr></thead>
+<tbody>
+<sc-for list="{{ slideRows }}" as="r" hint-placeholder-count="13">
+<tr><td class="ad-td" style="font-weight: 600">{{ r.n }}</td><td class="ad-td"><button class="ad-ghost" onClick="{{ r.cycleScr }}" style="min-width: 130px">{{ r.scr }}</button></td><td class="ad-td"><button class="ad-ghost" onClick="{{ r.cycleAct }}" style="min-width: 150px; background: {{ r.actBg }}">{{ r.act }}</button></td><td class="ad-td" style="color: #4A4A44">[deck slide {{ r.n }}]</td></tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div><button class="ad-ghost" onClick="{{ addSlide }}">+ Add slide</button></div>
+</div>
+
+<div class="ad-card" style="border: 2px solid #1F3A2E">
+<div style="font-size: 14px; line-height: 1.5; color: #2B2B27">Publishing writes {{ path }} and the slide map, then classes assigned this module see the new version at their next visit. Learners' existing answers stay as they were.</div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+<button class="ad-ghost" onClick="{{ saveDraft }}">Save draft</button>
+<button class="ad-btn" disabled="{{ publishDisabled }}" onClick="{{ publish }}">Publish to classes</button>
+<span style="font-size: 13px; color: {{ msgColor }}">{{ msg }}</span>
+</div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isAccess }}" hint-placeholder-val="{{ false }}">
+<div class="ad-card">
+<h1 class="ad-h">Access</h1>
+<div style="font-size: 14px; line-height: 1.5; color: #2B2B27">Grant facilitator or admin access. Anyone above Learner sees the View menu and can switch between the versions they're allowed. A learner never sees it.</div>
+<div style="overflow-x: auto">
+<table style="width: 100%; border-collapse: collapse; min-width: 560px">
+<thead><tr><th class="ad-th">PERSON</th><th class="ad-th">ACCESS (TAP TO CHANGE)</th><th class="ad-th">CAN</th></tr></thead>
+<tbody>
+<sc-for list="{{ accessRows }}" as="r" hint-placeholder-count="5">
+<tr><td class="ad-td">{{ r.id }}</td><td class="ad-td"><button class="ad-ghost" onClick="{{ r.cycle }}" style="min-width: 140px">{{ r.level }}</button></td><td class="ad-td" style="color: #2B2B27">{{ r.can }}</td></tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div style="font-size: 12px; color: #4A4A44">Every access change is written to the audit log.</div>
+</div>
+</sc-if>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1040}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tab: 'material', roleOpen: false, mod: 1, edits: {}, slides: {}, status: {}, msg: '', access: [2, 1, 0, 0, 0] };
+  }
+  baseSlides() {
+    return [['Hook', ''], ['Hook', ''], ['Expose', ''], ['Expose', 'Quick check'], ['Verse', ''], ['Verse', ''], ['Verse', 'Role-play'], ['Bridge', 'Bridge'], ['Unveil', 'Unveil'], ['Remix', 'Remix'], ['GENE Outro', 'GENE'], ['Almanac', 'Seal'], ['Interlude', 'Daily rep']];
+  }
+  renderVals() {
+    const s = this.state; const set = (o) => this.setState(o);
+    const pad = (n) => (n < 10 ? 'M0' + n : 'M' + n);
+    const names = ['Phase 1', 'Phase 2', 'Phase 3'];
+    const cs = ['Character', 'Competence', 'Capability', 'Cohesion', 'Capacity'];
+    const scrs = ['Hook', 'Expose', 'Verse', 'Bridge', 'Unveil', 'Remix', 'GENE Outro', 'Almanac', 'Interlude'];
+    const acts = ['', 'Quick check', 'Role-play', 'Bridge', 'Unveil', 'Remix', 'GENE', 'Seal', 'Daily rep'];
+    const f = Object.assign({ title: '', focus: '', outcome: '', daily: '', opener: '', scenario: '', law: '', c: 3 }, s.edits[s.mod] || {});
+    const setF = (k, v) => { const e = Object.assign({}, s.edits); e[s.mod] = Object.assign({}, f); e[s.mod][k] = v; const st = Object.assign({}, s.status); if (st[s.mod] !== 'Draft') st[s.mod] = 'Edited'; set({ edits: e, status: st, msg: '' }); };
+    const on = {}; ['title', 'focus', 'outcome', 'daily', 'opener', 'scenario', 'law'].forEach((k) => { on[k] = (e) => setF(k, e.target.value); });
+    const sl = s.slides[s.mod] || this.baseSlides();
+    const setSl = (x) => { const all = Object.assign({}, s.slides); all[s.mod] = x; const st = Object.assign({}, s.status); st[s.mod] = 'Edited'; set({ slides: all, status: st, msg: '' }); };
+    const phase = Math.ceil(s.mod / 8);
+    const levels = ['Learner', 'Facilitator', 'Admin'];
+    const can = ['Follow along, write, seal', 'Classes, assign work, people and roles, live sessions', 'Everything a facilitator can, plus edit material and grant access'];
+    return {
+      roleOpen: s.roleOpen, roleExpanded: s.roleOpen ? 'true' : 'false', toggleRole: () => set({ roleOpen: !s.roleOpen }),
+      isMaterial: s.tab === 'material', isAccess: s.tab === 'access',
+      tabMaterial: () => set({ tab: 'material' }), tabAccess: () => set({ tab: 'access' }),
+      matBg: s.tab === 'material' ? '#1F3A2E' : 'transparent', matFg: s.tab === 'material' ? '#F7F2E8' : '#2B2B27', accBg: s.tab === 'access' ? '#1F3A2E' : 'transparent', accFg: s.tab === 'access' ? '#F7F2E8' : '#2B2B27',
+      modList: Array.from({ length: 24 }, (_, i) => { const n = i + 1, c = n === s.mod; return { code: pad(n), status: s.status[n] || 'Published v1', bg: c ? '#1F3A2E' : '#FBF8F2', fg: c ? '#F7F2E8' : '#2B2B27', border: c ? '1px solid #1F3A2E' : '1px solid #D6CCB8', pick: () => set({ mod: n, msg: '' }) }; }),
+      code: pad(s.mod), phaseName: 'Phase ' + phase, path: 'content/phase-' + phase + '/module-' + (s.mod < 10 ? '0' + s.mod : s.mod) + '.md',
+      statusLabel: (s.status[s.mod] || 'Published v1').toUpperCase(),
+      f: f, on: on, cName: cs[f.c], cycleC: () => setF('c', (f.c + 1) % cs.length),
+      slideCount: sl.length,
+      slideRows: sl.map((r, i) => ({ n: i + 1, scr: r[0], act: r[1] || 'None', actBg: r[1] ? '#E4ECE3' : 'transparent',
+        cycleScr: () => { const x = sl.map((y) => y.slice()); x[i][0] = scrs[(scrs.indexOf(r[0]) + 1) % scrs.length]; setSl(x); },
+        cycleAct: () => { const x = sl.map((y) => y.slice()); x[i][1] = acts[(acts.indexOf(r[1]) + 1) % acts.length]; setSl(x); } })),
+      addSlide: () => setSl(sl.concat([['Verse', '']])),
+      saveDraft: () => { const st = Object.assign({}, s.status); st[s.mod] = 'Draft'; set({ status: st, msg: 'Draft saved. Only admins can see it.' }); },
+      publishDisabled: !s.status[s.mod] || s.status[s.mod] === 'Published v2',
+      publish: () => { const st = Object.assign({}, s.status); st[s.mod] = 'Published v2'; set({ status: st, msg: 'Published v2. Assigned classes see it next visit.' }); },
+      msg: s.msg, msgColor: '#1F3A2E',
+      accessRows: s.access.map((lv, i) => ({ id: i === 0 ? '[You] · Nolan' : '[Person ' + (i + 1) + ']', level: levels[lv], can: can[lv], cycle: () => { if (i === 0) return; const x = s.access.slice(); x[i] = (lv + 1) % 3; set({ access: x }); } }))
+    };
+  }
+}
+</script>
+</body>
+</html>

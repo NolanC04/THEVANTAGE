@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Airman AAPEX · Your modules</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&amp;family=EB+Garamond:ital,wght@0,400;0,500;1,400&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F3A2E}a:hover{color:#141413}
+.ap-in{box-sizing:border-box;width:100%;min-height:48px;padding:12px 14px;border:1px solid #BFB39C;border-radius:10px;background:#FBF8F2;font:16px Inter,system-ui,sans-serif;color:#141413}
+.ap-ghost{min-height:44px;border:1px solid #1F3A2E;border-radius:12px;background:transparent;color:#1F3A2E;font:600 14px Inter,system-ui,sans-serif;cursor:pointer;padding:0 14px}
+.ap-ghost:disabled{border-color:#B8B2A4;color:#6E6A60;cursor:not-allowed}
+.ap-seg{flex:1;min-height:44px;border:0;border-radius:10px;font:600 13px Inter,sans-serif;cursor:pointer}
+.ap-tile{display:flex;flex-direction:column;justify-content:space-between;gap:10px;min-height:116px;border-radius:14px;padding:14px;box-sizing:border-box;text-decoration:none;font-family:Inter,sans-serif}
+.ap-tile-open{background:#F7F2E8;color:#141413;border:1px solid #1F3A2E}
+.ap-tile-open:hover{background:#FFFFFF;color:#141413}
+.ap-tile-cur{background:#1F3A2E;color:#F7F2E8;border:1px solid #1F3A2E}
+.ap-tile-cur:hover{color:#F7F2E8;background:#18302A}
+.ap-resume{display:flex;align-items:center;justify-content:space-between;min-height:64px;padding:0 16px;border-radius:14px;background:#1F3A2E;color:#F7F2E8;text-decoration:none;font:600 15px Inter,sans-serif}
+.ap-resume:hover{color:#F7F2E8;background:#18302A}
+.ap-role{display:flex;align-items:center;gap:6px;min-height:40px;padding:0 12px;border-radius:20px;border:1px solid #1F3A2E;background:#F7F2E8;color:#1F3A2E;font:600 13px Inter,sans-serif;cursor:pointer}
+.ap-role-item{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;padding:0 14px;color:#141413;text-decoration:none;font:500 14px Inter,sans-serif}
+.ap-role-item:hover{background:#EEE7D8;color:#141413}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #EEE7D8; color: #141413; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 12px; border-bottom: 1px solid #D6CCB8">
+<div style="font-family: Cinzel, serif; font-weight: 700; font-size: 18px; letter-spacing: 3px; color: #1F3A2E">AAPEX</div>
+<div style="position: relative">
+<button class="ap-role" onClick="{{ toggleRole }}" aria-expanded="{{ roleExpanded }}" aria-haspopup="true">View: Learner<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
+<sc-if value="{{ roleOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; right: 0; top: 48px; width: 200px; background: #FBF8F2; border: 1px solid #BFB39C; border-radius: 12px; overflow: hidden; z-index: 5; box-shadow: 0 8px 24px rgba(20,20,19,0.15)">
+<a class="ap-role-item" href="Facilitator.dc.html">Facilitator</a>
+<a class="ap-role-item" href="Learner-Modules.dc.html" aria-current="page" style="font-weight: 600">Learner<span aria-hidden="true">✓</span></a>
+<a class="ap-role-item" href="Admin.dc.html">Admin</a>
+<div style="padding: 8px 14px 10px; font-size: 11px; line-height: 1.4; color: #4A4A44; border-top: 1px solid #E3DACA">Shown only to people with facilitator or admin access.</div>
+</div>
+</sc-if>
+</div>
+</div>
+<div style="flex: 1; overflow-y: auto; padding: 18px 20px 24px; display: flex; flex-direction: column; gap: 16px">
+<div style="font-family: Cinzel, serif; font-weight: 700; font-size: 22px; color: #1F3A2E">Your modules</div>
+<a class="ap-resume" href="Learner-Player.dc.html">
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 11px; letter-spacing: 1.5px; opacity: 0.85">TONIGHT · SESSION P1</span><span>Start M01 · slide 1</span></span>
+<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+</a>
+<div style="background: #F7F2E8; border: 1px solid #D6CCB8; border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-size: 11px; font-weight: 600; letter-spacing: 1.5px; color: #1F3A2E">TODAY · DAILY REP</span><span style="font-size: 12px; color: #4A4A44">2 min</span></div>
+<sc-if value="{{ dailyOpen }}" hint-placeholder-val="{{ true }}">
+<div style="font-family: 'EB Garamond', serif; font-size: 17px; line-height: 1.4">[Daily rep prompt: one small practice of this session's focus skill]</div>
+<textarea class="ap-in" rows="2" value="{{ dailyText }}" onChange="{{ onDaily }}" placeholder="A line or two is enough"></textarea>
+<button class="ap-ghost" disabled="{{ dailyDisabled }}" onClick="{{ saveDaily }}">Save to my Almanac</button>
+</sc-if>
+<sc-if value="{{ dailyDone }}" hint-placeholder-val="{{ false }}">
+<div style="font-size: 14px; color: #1F3A2E">Logged for today. A new one shows up tomorrow.</div>
+</sc-if>
+</div>
+<div style="display: flex; gap: 6px; background: #E2D9C6; border-radius: 12px; padding: 4px" role="tablist" aria-label="Phase">
+<sc-for list="{{ phaseTabs }}" as="p" hint-placeholder-count="3">
+<button class="ap-seg" role="tab" aria-selected="{{ p.sel }}" onClick="{{ p.go }}" style="background: {{ p.bg }}; color: {{ p.fg }}">{{ p.name }}</button>
+</sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<sc-for list="{{ tiles }}" as="m" hint-placeholder-count="8">
+<sc-if value="{{ m.open }}" hint-placeholder-val="{{ true }}">
+<a class="{{ m.cls }}" href="Learner-Player.dc.html">
+<span style="display: flex; justify-content: space-between; align-items: center"><span style="font-family: Cinzel, serif; font-size: 22px; font-weight: 700">{{ m.code }}</span><span style="font-size: 11px; letter-spacing: 1px">{{ m.state }}</span></span>
+<span style="font-family: 'EB Garamond', serif; font-size: 16px">[Module title]</span>
+</a>
+</sc-if>
+<sc-if value="{{ m.locked }}" hint-placeholder-val="{{ false }}">
+<div class="ap-tile" style="background: #E2D9C6; color: #5A574E; border: 1px solid #D6CCB8" aria-disabled="true">
+<span style="display: flex; justify-content: space-between; align-items: center"><span style="font-family: Cinzel, serif; font-size: 22px; font-weight: 700">{{ m.code }}</span><span style="font-size: 11px; letter-spacing: 1px">LOCKED</span></span>
+<span style="font-family: 'EB Garamond', serif; font-size: 16px">[Module title]</span>
+</div>
+</sc-if>
+</sc-for>
+</div>
+<div style="font-size: 12px; line-height: 1.5; color: #4A4A44">Your facilitator opens modules for your class. Everything you write goes into your Almanac, which you can export or delete from the menu.</div>
+<a href="Main.dc.html" style="font-size: 13px; color: #4A4A44; min-height: 44px; display: inline-flex; align-items: center">Sign out</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { phase: 1, roleOpen: false, dailyText: '', dailyDone: false }; }
+  renderVals() {
+    const s = this.state;
+    const set = (o) => this.setState(o);
+    const names = ['Phase 1', 'Phase 2', 'Phase 3'];
+    const unlocked = { 1: true, 9: true, 17: true };
+    const pad = (n) => (n < 10 ? 'M0' + n : 'M' + n);
+    const tiles = [1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
+      const n = (s.phase - 1) * 8 + i; const open = !!unlocked[n]; const cur = n === 1;
+      return { code: pad(n), open: open, locked: !open, cls: cur ? 'ap-tile ap-tile-cur' : 'ap-tile ap-tile-open', state: cur ? 'TONIGHT' : 'OPEN' };
+    });
+    return {
+      roleOpen: s.roleOpen, roleExpanded: s.roleOpen ? 'true' : 'false', toggleRole: () => set({ roleOpen: !s.roleOpen }),
+      phaseTabs: [1, 2, 3].map((p) => ({ name: names[p - 1], sel: s.phase === p ? 'true' : 'false', bg: s.phase === p ? '#1F3A2E' : 'transparent', fg: s.phase === p ? '#F7F2E8' : '#2B2B27', go: () => set({ phase: p }) })),
+      tiles: tiles,
+      dailyOpen: !s.dailyDone, dailyDone: s.dailyDone, dailyText: s.dailyText, onDaily: (e) => set({ dailyText: e.target.value }), dailyDisabled: !s.dailyText.trim(), saveDaily: () => set({ dailyDone: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

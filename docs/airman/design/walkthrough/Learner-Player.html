@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Airman AAPEX · Module player</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&amp;family=EB+Garamond:ital,wght@0,400;0,500;1,400&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F3A2E}a:hover{color:#141413}
+.ap-in{box-sizing:border-box;width:100%;min-height:48px;padding:12px 14px;border:1px solid #BFB39C;border-radius:10px;background:#FBF8F2;font:16px Inter,system-ui,sans-serif;color:#141413}
+.ap-in:focus{outline:2px solid #1F3A2E;outline-offset:1px}
+.ap-btn{min-height:48px;border:0;border-radius:12px;background:#1F3A2E;color:#F7F2E8;font:600 15px Inter,system-ui,sans-serif;cursor:pointer;padding:0 18px}
+.ap-btn:disabled{background:#B8B2A4;color:#4A4A44;cursor:not-allowed}
+.ap-ghost{min-height:44px;border:1px solid #1F3A2E;border-radius:12px;background:transparent;color:#1F3A2E;font:600 14px Inter,system-ui,sans-serif;cursor:pointer;padding:0 14px}
+.ap-ghost:disabled{border-color:#B8B2A4;color:#6E6A60;cursor:not-allowed}
+.ap-opt{width:100%;text-align:left;min-height:48px;border:1px solid #BFB39C;border-radius:10px;background:#FBF8F2;padding:12px 14px;font:15px Inter,system-ui,sans-serif;color:#141413;cursor:pointer}
+.ap-opt:disabled{cursor:default}
+.ap-arrow{width:52px;height:52px;border-radius:26px;border:0;background:#1F3A2E;color:#F7F2E8;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.ap-arrow:disabled{background:#CFC5B0;color:#6E6A60;cursor:not-allowed}
+.ap-thumb{flex:0 0 34px;height:34px;border-radius:8px;font:600 12px Inter,sans-serif;cursor:pointer}
+.ap-thumb:disabled{cursor:not-allowed}
+.ap-cue{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:20px;background:#F7F2E8;color:#1F3A2E;font:600 13px Inter,sans-serif;text-decoration:none}
+.ap-cue:hover{color:#1F3A2E;background:#FFFFFF}
+.ap-up{font:600 13px Inter,sans-serif;color:#1F3A2E;text-decoration:none;display:inline-flex;align-items:center;min-height:44px}
+.ap-back{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#1F3A2E;border-radius:22px;flex-shrink:0}
+.ap-back:hover{background:#E2D9C6;color:#1F3A2E}
+.ap-card{background:#F7F2E8;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;scroll-margin-top:12px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #EEE7D8; color: #141413; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+<div style="display: flex; align-items: center; gap: 6px; padding: 10px 10px 8px; border-bottom: 1px solid #D6CCB8">
+<a class="ap-back" href="Learner-Modules.dc.html" aria-label="Back to modules"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M14 4l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2"/></svg></a>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<div style="font-size: 11px; letter-spacing: 1.5px; color: #4A4A44">M01 · PHASE 1</div>
+<div style="font-family: Cinzel, serif; font-weight: 700; font-size: 15px; color: #1F3A2E">{{ screenName }}</div>
+</div>
+<button onClick="{{ toggleFollow }}" aria-pressed="{{ followPressed }}" style="min-height: 40px; border-radius: 20px; border: 1px solid #1F3A2E; background: {{ followBg }}; color: {{ followFg }}; font: 600 12px Inter, sans-serif; padding: 0 12px; cursor: pointer">{{ followLabel }}</button>
+</div>
+<div style="flex: 1; overflow-y: auto; min-height: 0">
+<div id="slide" style="padding: 14px 16px 6px; display: flex; flex-direction: column; gap: 12px">
+<div onTouchStart="{{ touchStart }}" onTouchEnd="{{ touchEnd }}" style="aspect-ratio: 16 / 9; border-radius: 14px; background: #1F3A2E; color: #F7F2E8; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 14px 16px; box-sizing: border-box">
+<div style="display: flex; justify-content: space-between; font-size: 11px; letter-spacing: 1px; opacity: 0.85"><span>{{ screenNameUpper }}</span><span>{{ slideNum }} / {{ slideTotal }}</span></div>
+<div style="font-family: 'EB Garamond', serif; font-size: 19px; line-height: 1.3; text-align: center">{{ slideText }}</div>
+<div style="display: flex; justify-content: center; min-height: 40px">
+<sc-if value="{{ slideHasAct }}" hint-placeholder-val="{{ false }}">
+<a class="ap-cue" href="{{ actHref }}">{{ cueLabel }}<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 2v9 M3 7l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"/></svg></a>
+</sc-if>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<button class="ap-arrow" disabled="{{ prevDisabled }}" onClick="{{ prev }}" aria-label="Previous slide"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M13 4l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2"/></svg></button>
+<div style="flex: 1; display: flex; gap: 6px; overflow-x: auto; padding: 4px 0">
+<sc-for list="{{ thumbs }}" as="t" hint-placeholder-count="13">
+<button class="ap-thumb" disabled="{{ t.disabled }}" onClick="{{ t.go }}" aria-label="{{ t.aria }}" style="background: {{ t.bg }}; color: {{ t.fg }}; border: {{ t.border }}">{{ t.n }}</button>
+</sc-for>
+</div>
+<button class="ap-arrow" disabled="{{ nextDisabled }}" onClick="{{ next }}" aria-label="Next slide"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2"/></svg></button>
+</div>
+<div style="font-size: 12px; line-height: 1.45; color: {{ hintColor }}; text-align: center; min-height: 18px">{{ navHint }}</div>
+</div>
+
+<div style="padding: 6px 16px 28px; display: flex; flex-direction: column; gap: 12px">
+<div style="font-size: 12px; font-weight: 600; letter-spacing: 1.5px; color: #4A4A44; padding-top: 6px">ACTIVITIES IN THIS MODULE</div>
+
+<div id="act-check" class="ap-card" style="border: {{ a.check.border }}">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-weight: 600">Quick check</span><span style="font-size: 11px; letter-spacing: 1px; color: {{ a.check.tagColor }}">{{ a.check.tag }}</span></div>
+<div style="font-family: 'EB Garamond', serif; font-size: 18px; line-height: 1.4">[Quick-check question]</div>
+<sc-for list="{{ opts }}" as="o" hint-placeholder-count="4">
+<button class="ap-opt" disabled="{{ o.disabled }}" onClick="{{ o.pick }}" style="border: {{ o.border }}; background: {{ o.bg }}">{{ o.label }}</button>
+</sc-for>
+<button class="ap-btn" disabled="{{ lockDisabled }}" onClick="{{ lockAnswer }}">{{ lockLabel }}</button>
+<a class="ap-up" href="#slide">↑ Back to the slide</a>
+</div>
+
+<div id="act-roleplay" class="ap-card" style="border: {{ a.roleplay.border }}">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-weight: 600">Role-play</span><span style="font-size: 11px; letter-spacing: 1px; color: {{ a.roleplay.tagColor }}">{{ a.roleplay.tag }}</span></div>
+<div style="font-size: 13px; color: #4A4A44">Practice the skill on a realistic situation. [Contact persona]</div>
+<sc-for list="{{ rpTurns }}" as="t" hint-placeholder-count="1">
+<div style="align-self: {{ t.align }}; max-width: 90%; background: {{ t.bg }}; color: {{ t.fg }}; border-radius: 14px; padding: 12px 14px; font-family: 'EB Garamond', serif; font-size: 17px; line-height: 1.45; white-space: pre-wrap">{{ t.text }}</div>
+</sc-for>
+<sc-if value="{{ rpNotStarted }}" hint-placeholder-val="{{ true }}">
+<button class="ap-ghost" onClick="{{ rpStart }}">Start the scenario</button>
+</sc-if>
+<sc-if value="{{ rpActive }}" hint-placeholder-val="{{ false }}">
+<textarea class="ap-in" rows="2" value="{{ rpReply }}" onChange="{{ onRp }}" placeholder="What do you say or do?"></textarea>
+<button class="ap-ghost" disabled="{{ rpDisabled }}" onClick="{{ rpSend }}">Respond · decision {{ rpBeat }} of 3</button>
+</sc-if>
+<sc-if value="{{ rpDone }}" hint-placeholder-val="{{ false }}">
+<div style="font-size: 13px; color: #1F3A2E">Scenario resolved. GENE will use it in your Outro.</div>
+</sc-if>
+<a class="ap-up" href="#slide">↑ Back to the slide</a>
+</div>
+
+<div id="act-bridge" class="ap-card" style="border: {{ a.bridge.border }}">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-weight: 600">Bridge · your answer</span><span style="font-size: 11px; letter-spacing: 1px; color: {{ a.bridge.tagColor }}">{{ a.bridge.tag }}</span></div>
+<div style="font-family: 'EB Garamond', serif; font-size: 18px; line-height: 1.4">[Bridge prompt]</div>
+<textarea class="ap-in" rows="6" value="{{ bridge }}" onChange="{{ onBridge }}" disabled="{{ bridgeSubmitted }}" placeholder="Write here. Drafts save as you type." style="font-family: 'EB Garamond', serif; font-size: 18px; line-height: 1.45"></textarea>
+<div style="font-size: 12px; color: #4A4A44">{{ bridgeStatus }}</div>
+<button class="ap-btn" disabled="{{ submitDisabled }}" onClick="{{ submitBridge }}">{{ submitLabel }}</button>
+<a class="ap-up" href="#slide">↑ Back to the slide</a>
+</div>
+
+<div id="act-unveil" class="ap-card" style="border: {{ a.unveil.border }}">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-weight: 600">Unveil</span><span style="font-size: 11px; letter-spacing: 1px; color: {{ a.unveil.tagColor }}">{{ a.unveil.tag }}</span></div>
+<sc-if value="{{ bridgeSubmitted }}" hint-placeholder-val="{{ false }}">
+<div style="font-family: 'EB Garamond', serif; font-size: 18px; line-height: 1.45">[Unveil copy]</div>
+<div style="font-family: 'EB Garamond', serif; font-size: 16px; font-style: italic; white-space: pre-wrap">You wrote: {{ bridgeShown }}</div>
+</sc-if>
+<sc-if value="{{ bridgeOpen }}" hint-placeholder-val="{{ true }}">
+<div style="font-size: 14px; color: #4A4A44">Opens after you submit your Bridge answer.</div>
+</sc-if>
+</div>
+
+<div id="act-remix" class="ap-card" style="border: {{ a.remix.border }}">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-weight: 600">Remix · optional</span><span style="font-size: 11px; letter-spacing: 1px; color: {{ a.remix.tagColor }}">{{ a.remix.tag }}</span></div>
+<div style="font-family: 'EB Garamond', serif; font-size: 18px; line-height: 1.4">[Remix prompt]</div>
+<button class="ap-ghost" onClick="{{ addPhoto }}">{{ photoLabel }}</button>
+</div>
+
+<div id="act-gene" class="ap-card" style="border: {{ a.gene.border }}">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-weight: 600">GENE</span><span style="font-size: 11px; letter-spacing: 1px; color: {{ a.gene.tagColor }}">{{ a.gene.tag }}</span></div>
+<sc-if value="{{ bridgeOpen }}" hint-placeholder-val="{{ true }}">
+<div style="font-size: 14px; color: #4A4A44">GENE reads your Bridge answer, so it opens once that's submitted.</div>
+</sc-if>
+<sc-if value="{{ bridgeSubmitted }}" hint-placeholder-val="{{ false }}">
+<sc-for list="{{ turns }}" as="t" hint-placeholder-count="1">
+<div style="align-self: {{ t.align }}; max-width: 90%; background: {{ t.bg }}; color: {{ t.fg }}; border-radius: 14px; padding: 12px 14px; font-family: 'EB Garamond', serif; font-size: 17px; line-height: 1.45; white-space: pre-wrap">{{ t.text }}</div>
+</sc-for>
+<sc-if value="{{ geneOpen }}" hint-placeholder-val="{{ true }}">
+<textarea class="ap-in" rows="3" value="{{ reply }}" onChange="{{ onReply }}" placeholder="Answer GENE"></textarea>
+<button class="ap-ghost" disabled="{{ replyDisabled }}" onClick="{{ sendReply }}">Send · turn {{ geneTurn }} of 3</button>
+</sc-if>
+</sc-if>
+</div>
+
+<div id="act-seal" class="ap-card" style="border: {{ a.seal.border }}">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-weight: 600">Seal into your Almanac</span><span style="font-size: 11px; letter-spacing: 1px; color: {{ a.seal.tagColor }}">{{ a.seal.tag }}</span></div>
+<div style="font-size: 14px; color: #2B2B27">Your Bridge answer and {{ geneCount }} GENE exchanges go into your permanent record.</div>
+<button class="ap-btn" disabled="{{ sealDisabled }}" onClick="{{ seal }}">{{ sealLabel }}</button>
+<a class="ap-up" href="#slide">↑ Back to the slide</a>
+</div>
+
+<div id="act-daily" class="ap-card" style="border: {{ a.daily.border }}">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-weight: 600">Daily rep · until next session</span><span style="font-size: 11px; letter-spacing: 1px; color: {{ a.daily.tagColor }}">{{ a.daily.tag }}</span></div>
+<div style="font-size: 14px; line-height: 1.45; color: #2B2B27">A two-minute practice of this module's skill shows up on your Modules screen each day.</div>
+<a class="ap-up" href="Learner-Modules.dc.html">Done for tonight · back to my modules</a>
+</div>
+
+<div style="border: 1px solid #BFB39C; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px; margin-top: 8px">
+<div style="font-weight: 600; font-size: 14px">Want to talk to someone?</div>
+<div style="font-size: 13px; line-height: 1.5; color: #2B2B27">Not an emergency: Chaplain · Military and Family Life Counselor · Embedded mental health · Military and Family Readiness Center. [Malmstrom contacts]</div>
+<div style="font-size: 13px; line-height: 1.5; color: #2B2B27">In crisis: call 988 and press 1, or text 838255.</div>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { slide: 0, bridge: '', bridgeSubmitted: false, turns: [], reply: '', photo: false, sealed: false, pick: -1, locked: false, follow: false, tx: null, rp: [], rpReply: '' };
+  }
+  renderVals() {
+    const s = this.state;
+    const set = (o) => this.setState(o);
+    const slides = [
+      { scr: 'Hook', text: '[Hook slide 1]' },
+      { scr: 'Hook', text: '[Hook slide 2]' },
+      { scr: 'Expose', text: '[Expose slide 1]' },
+      { scr: 'Expose', text: '[Expose slide 2: quick check]', act: 'check' },
+      { scr: 'Verse', text: '[Verse slide 1]' },
+      { scr: 'Verse', text: '[Verse slide 2]' },
+      { scr: 'Verse', text: '[Practice slide: run the scenario below]', act: 'roleplay' },
+      { scr: 'Bridge', text: '[Bridge slide: write your answer below]', act: 'bridge' },
+      { scr: 'Unveil', text: '[Unveil slide]', act: 'unveil' },
+      { scr: 'Remix', text: '[Remix slide]', act: 'remix' },
+      { scr: 'GENE Outro', text: '[Outro slide: talk it through with GENE]', act: 'gene' },
+      { scr: 'Almanac', text: '[Almanac slide: seal this module]', act: 'seal' },
+      { scr: 'Interlude', text: '[Interlude: the Closing Law, then your daily rep]', act: 'daily' }
+    ];
+    const total = slides.length, bridgeIdx = 7, cur = slides[s.slide];
+    const blocked = (i) => i > bridgeIdx && !s.bridgeSubmitted;
+    const go = (i) => { if (i < 0 || i >= total || blocked(i) || s.follow) return; set({ slide: i }); };
+    const rpBeats = s.rp.filter((t) => t.who === 'me').length;
+    const actSlide = { check: 3, roleplay: 6, bridge: 7, unveil: 8, remix: 9, gene: 10, seal: 11, daily: 12 };
+    const a = {};
+    Object.keys(actSlide).forEach((k) => {
+      const now = cur.act === k;
+      let tag = (now ? 'NOW · ' : '') + 'SLIDE ' + (actSlide[k] + 1);
+      if (k === 'bridge' && s.bridgeSubmitted) tag = 'SUBMITTED';
+      if (k === 'check' && s.locked) tag = 'LOCKED IN';
+      if (k === 'seal' && s.sealed) tag = 'SEALED';
+      if (k === 'roleplay' && rpBeats >= 3) tag = 'DONE';
+      a[k] = { border: now ? '2px solid #1F3A2E' : '1px solid #D6CCB8', tag: tag, tagColor: now ? '#1F3A2E' : '#4A4A44' };
+    });
+    const cues = { check: 'Quick check below', roleplay: 'Run the scenario below', bridge: 'Write your answer below', unveil: 'See the Unveil below', remix: 'Remix below', gene: 'Talk to GENE below', seal: 'Seal it below', daily: 'See your daily rep below' };
+    const sel = '2px solid #1F3A2E', unsel = '1px solid #BFB39C';
+    const geneN = s.turns.filter((t) => t.who === 'gene').length;
+    const closed = s.turns.some((t) => t.closing);
+    let navHint = 'Swipe the slide or use the arrows. Green numbers have an activity.', hintColor = '#4A4A44';
+    if (s.follow) navHint = 'Synced to the room: the facilitator is moving the slides.';
+    else if (s.slide === bridgeIdx && !s.bridgeSubmitted) { navHint = 'Submit your Bridge answer below to keep going.'; hintColor = '#1F3A2E'; }
+    return {
+      screenName: cur.scr, screenNameUpper: cur.scr.toUpperCase(), slideNum: s.slide + 1, slideTotal: total, slideText: cur.text,
+      slideHasAct: !!cur.act, actHref: '#act-' + (cur.act || 'check'), cueLabel: cur.act ? cues[cur.act] : '',
+      followLabel: s.follow ? 'Live · synced' : 'Follow room', followBg: s.follow ? '#1F3A2E' : 'transparent', followFg: s.follow ? '#F7F2E8' : '#1F3A2E', followPressed: s.follow ? 'true' : 'false', toggleFollow: () => set({ follow: !s.follow }),
+      touchStart: (e) => set({ tx: e.touches && e.touches[0] ? e.touches[0].clientX : null }),
+      touchEnd: (e) => { if (s.tx === null || !e.changedTouches) return; const dx = e.changedTouches[0].clientX - s.tx; if (dx < -40) go(s.slide + 1); else if (dx > 40) go(s.slide - 1); },
+      prevDisabled: s.slide === 0 || s.follow, nextDisabled: s.slide === total - 1 || blocked(s.slide + 1) || s.follow,
+      prev: () => go(s.slide - 1), next: () => go(s.slide + 1), navHint: navHint, hintColor: hintColor,
+      thumbs: slides.map((sl, i) => { const c = i === s.slide, dis = blocked(i) || s.follow; return { n: i + 1, aria: 'Slide ' + (i + 1) + ', ' + sl.scr, disabled: dis, go: () => go(i), bg: c ? '#1F3A2E' : (sl.act ? '#E4ECE3' : '#F7F2E8'), fg: c ? '#F7F2E8' : (dis ? '#8A8578' : '#1F3A2E'), border: c ? '1px solid #1F3A2E' : (sl.act ? '1px solid #4F7A62' : '1px solid #D6CCB8') }; }),
+      a: a,
+      opts: ['[Option A]', '[Option B]', '[Option C]', '[Option D]'].map((label, i) => ({ label: label, disabled: s.locked, border: s.pick === i ? sel : unsel, bg: s.pick === i ? '#E4ECE3' : '#FBF8F2', pick: () => set({ pick: i }) })),
+      lockDisabled: s.pick < 0 || s.locked, lockAnswer: () => set({ locked: true }), lockLabel: s.locked ? 'Answer locked ✓' : 'Lock my answer',
+      rpTurns: s.rp.map((t) => t.who === 'them' ? { text: t.text, align: 'flex-start', bg: '#2B2B27', fg: '#F7F2E8' } : { text: t.text, align: 'flex-end', bg: '#FBF8F2', fg: '#141413' }),
+      rpNotStarted: s.rp.length === 0, rpActive: s.rp.length > 0 && rpBeats < 3, rpDone: rpBeats >= 3, rpBeat: rpBeats + 1,
+      rpReply: s.rpReply, onRp: (e) => set({ rpReply: e.target.value }), rpDisabled: !s.rpReply.trim(),
+      rpStart: () => set({ rp: [{ who: 'them', text: '[Opening hook: the contact persona puts you in the situation]' }] }),
+      rpSend: () => { const t = s.rp.concat([{ who: 'me', text: s.rpReply }]); const n = t.filter((x) => x.who === 'me').length; t.push({ who: 'them', text: n < 3 ? '[Decision beat ' + (n + 1) + ': the persona reacts and raises the stakes]' : '[Resolution: how it lands, based on your choices]' }); set({ rp: t, rpReply: '' }); },
+      bridge: s.bridge, bridgeSubmitted: s.bridgeSubmitted, bridgeOpen: !s.bridgeSubmitted, onBridge: (e) => set({ bridge: e.target.value }),
+      bridgeStatus: s.bridgeSubmitted ? 'Submitted and frozen. The Unveil and GENE are open.' : (s.bridge ? 'Draft saved' : 'The next slides open when you submit.'),
+      submitDisabled: s.bridgeSubmitted || !s.bridge.trim(), submitLabel: s.bridgeSubmitted ? 'Submitted ✓' : 'Submit answer',
+      submitBridge: () => set({ bridgeSubmitted: true, turns: [{ who: 'gene', text: '[GENE turn 1: the Outro question, adapted to what you wrote]' }] }),
+      bridgeShown: s.bridge || '[Your Bridge answer]',
+      photoLabel: s.photo ? 'Photo added ✓' : 'Add a photo', addPhoto: () => set({ photo: !s.photo }),
+      turns: s.turns.map((t) => t.who === 'gene' ? { text: t.text, align: 'flex-start', bg: '#1F3A2E', fg: '#F7F2E8' } : { text: t.text, align: 'flex-end', bg: '#FBF8F2', fg: '#141413' }),
+      geneOpen: geneN > 0 && !closed, geneTurn: Math.min(3, geneN), reply: s.reply, onReply: (e) => set({ reply: e.target.value }), replyDisabled: !s.reply.trim(),
+      sendReply: () => { const t = s.turns.concat([{ who: 'me', text: s.reply }]); const g = t.filter((x) => x.who === 'gene').length; if (g < 3) t.push({ who: 'gene', text: '[GENE turn ' + (g + 1) + ': one question that exposes the reasoning]' }); else t.push({ who: 'gene', closing: true, text: '[GENE closing: one sentence naming what you uncovered]' }); set({ turns: t, reply: '' }); },
+      geneCount: s.turns.filter((x) => x.who === 'me').length,
+      sealDisabled: s.sealed || !s.bridgeSubmitted, seal: () => set({ sealed: true }), sealLabel: s.sealed ? 'Sealed ✓' : 'Seal this module'
+    };
+  }
+}
+</script>
+</body>
+</html>

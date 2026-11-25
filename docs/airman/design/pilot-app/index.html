@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Airman AAPEX — Pilot Cohort</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0b100d;--ink2:#121c16;--ever:#1f3a2c;--beige:#ece3cf;--beige2:#d9cdb2;--gold:#c2a04f;--gold2:#e2c879;--muted:#8e9a8f;--line:#2f4437;--red:#7a2e26}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--ink);color:var(--beige);font-family:"EB Garamond",Georgia,serif;-webkit-text-size-adjust:100%}
+body{display:flex;flex-direction:column;min-height:100dvh}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;padding-top:max(10px,env(safe-area-inset-top));background:linear-gradient(180deg,#0f1813,#0b100d);border-bottom:1px solid var(--line)}
+.brand b{display:block;font-family:Cinzel,serif;letter-spacing:.2em;color:var(--gold2);font-size:17px}
+.brand span{font-family:Cinzel,serif;font-size:9.5px;letter-spacing:.32em;color:var(--muted)}
+main{flex:1;width:100%;max-width:760px;margin:0 auto;padding:16px 16px 110px}
+nav#tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;background:#0b120e;border-top:1px solid var(--gold);padding:4px 2px calc(4px + env(safe-area-inset-bottom))}
+nav#tabs button{flex:1;background:none;border:0;color:var(--beige2);font-family:Cinzel,serif;font-size:10px;letter-spacing:.08em;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;min-height:52px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer}
+nav#tabs button b{font-family:Georgia,serif;font-weight:400;font-size:19px;color:var(--gold)}
+nav#tabs button.on{color:var(--gold2)}
+h1,h2,h3{font-family:Cinzel,serif;letter-spacing:.1em;color:var(--gold2);font-weight:700}
+h1{font-size:22px;margin:6px 0 6px}h2{font-size:17px;margin:22px 0 8px}h3{font-size:12px;letter-spacing:.2em;color:var(--gold);margin:18px 0 6px;border-bottom:1px solid var(--line);padding-bottom:5px}
+p,li{font-size:17px;line-height:1.5}
+.k{font-family:Cinzel,serif;font-size:10.5px;letter-spacing:.18em;color:var(--muted)}
+.note{font-size:14.5px;color:var(--muted);font-style:italic}
+.card{background:var(--ink2);border:1px solid var(--line);border-radius:6px;padding:14px;margin:10px 0}
+.card.tap{cursor:pointer}.card.tap:active{border-color:var(--gold)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--ever);border:1px solid var(--gold);color:var(--beige);font-family:Cinzel,serif;font-size:12px;letter-spacing:.12em;padding:11px 14px;border-radius:4px;cursor:pointer;min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.btn.ghost{background:none;border-color:var(--line);color:var(--beige2)}
+.btn.full{width:100%}
+.btn[disabled]{opacity:.45}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+textarea,input[type=text],input[type=password],select{width:100%;background:#0d1611;border:1px solid var(--line);color:var(--beige);border-radius:4px;padding:10px;font-family:inherit;font-size:16px}
+textarea{min-height:84px;resize:vertical;line-height:1.45}
+label.q{display:block;margin:14px 0 6px;font-size:16.5px;line-height:1.45}
+.chk{display:flex;gap:10px;align-items:flex-start;margin:10px 0;font-size:16px;line-height:1.45}
+.chk input{width:22px;height:22px;flex:none;margin-top:2px;accent-color:#c2a04f}
+.hero{position:relative;border:1px solid var(--gold);border-radius:4px;overflow:hidden;aspect-ratio:16/9;background:#050806}
+.hero img{width:100%;height:100%;object-fit:cover;display:block}
+.hero .cap{position:absolute;left:0;right:0;bottom:0;padding:26px 14px 10px;background:linear-gradient(180deg,transparent,rgba(5,8,6,.9))}
+.hero .cap b{font-family:Cinzel,serif;color:var(--gold2);letter-spacing:.1em;font-size:18px;display:block}
+.hero .cap span{font-size:13.5px;color:var(--beige2);font-style:italic}
+.mods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.mtile{border:1px solid var(--line);border-radius:4px;overflow:hidden;cursor:pointer;background:#050806;position:relative}
+.mtile img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
+.mtile div{padding:6px 7px 8px;font-size:13px;line-height:1.25}
+.mtile .seal,.seal{display:inline-block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#b5473b,#6e211b);border:1px solid #d9a07a;vertical-align:middle}
+.mtile .seal{position:absolute;top:6px;right:6px}
+.seal.gold{background:radial-gradient(circle at 35% 35%,#f0d78a,#9b7a2c);border-color:#f3e3a6}
+.scale{display:flex;gap:6px;margin:6px 0 4px;flex-wrap:wrap}
+.scale label{flex:1;min-width:38px;text-align:center;border:1px solid var(--line);border-radius:4px;padding:9px 0;cursor:pointer;font-size:15px;touch-action:manipulation}
+.scale input{display:none}
+.scale input:checked+span{color:#0b100d}
+.scale label:has(input:checked){background:var(--gold2);border-color:var(--gold2);color:#0b100d}
+.anchors{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted)}
+.law{border:3px double var(--gold);background:#141f18;padding:14px;border-radius:4px;font-style:italic;font-size:18px;line-height:1.5}
+.draft{border:1px dashed #9c7a3a;background:#1c1a10;padding:12px;border-radius:4px;font-size:15.5px}
+.tag{display:inline-block;font-family:Cinzel,serif;font-size:9.5px;letter-spacing:.14em;padding:2px 7px;border:1px solid var(--line);border-radius:2px;margin:0 4px 4px 0;color:var(--beige2)}
+.tag.ok{border-color:#5d8a6a;color:#a9d3b3}.tag.warn{border-color:#9c7a3a;color:#e2c879}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+td,th{border-bottom:1px solid var(--line);padding:6px 5px;text-align:left;vertical-align:top}
+th{font-family:Cinzel,serif;font-size:10px;letter-spacing:.12em;color:var(--gold)}
+.out{width:100%;min-height:120px;font:12.5px/1.4 ui-monospace,Menlo,monospace;background:#08100b;color:#d9d1bb;border:1px solid var(--line);padding:10px;border-radius:4px}
+.back{background:none;border:0;color:var(--gold);font-family:Cinzel,serif;font-size:12px;letter-spacing:.14em;padding:8px 0;cursor:pointer}
+.crisis{font-size:14px;color:var(--beige2);border-left:3px solid var(--gold);padding:6px 10px;margin:14px 0;background:#101912}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--gold2);color:#0b100d;padding:8px 14px;border-radius:4px;font-family:Cinzel,serif;font-size:12px;letter-spacing:.1em;z-index:9;display:none}
+.prog{height:6px;background:#1a261f;border-radius:3px;overflow:hidden}.prog i{display:block;height:100%;background:linear-gradient(90deg,#9b7a2c,#e2c879)}
+@media(min-width:780px){main{padding-bottom:120px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><b>AIRMAN AAPEX</b><span>PILOT COHORT · THE VANTAGE</span></div><span class="k" id="who"></span></header>
+<main id="view"></main>
+<nav id="tabs">
+ <button data-go="home"><b>◆</b>Home</button>
+ <button data-go="sessions"><b>▦</b>Sessions</button>
+ <button data-go="almanac"><b>❦</b>Almanac</button>
+ <button data-go="checkins"><b>✓</b>Check-ins</button>
+ <button data-go="me"><b>☰</b>More</button>
+</nav>
+<div class="toast" id="toast"></div>
+<script src="data.js"></script>
+<script>
+/* ===== storage (browser-only; works without sign-in; mobile-safe) ===== */
+const KEY="aapex_pilot_v1";let MEM=null;
+function load(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r)}catch(e){}return MEM||{profile:null,entries:{},checks:{},fac:{imports:[],notes:{},laws:{}}}}
+let S=load();
+function save(){MEM=S;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const $=s=>document.querySelector(s),esc=t=>String(t??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function toast(t){const e=$("#toast");e.textContent=t;e.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display="none",1600)}
+const M=n=>MODS[n-1];
+const PHASES=[["Phase 1 · Resiliency","The Shield","Reflection"],["Phase 2 · Efficacy","The Sword","Revelation"],["Phase 3 · Polymathy","The Star","Resolve"]];
+const SESS=[1,2,3,4,5,6,7,8].map(k=>({k,mods:[k,k+8,k+16],scene:MODS[k-1].scene}));
+const doneN=()=>Object.values(S.entries).filter(e=>e.done).length;
+function lawFor(n){return (window.APPROVED_LAWS||{})[n]||S.fac.laws[n]||""}
+
+/* ===== measures (validated, free-to-use scales — see facilitator notes) ===== */
+const MEASURES=[
+ {id:"swls",name:"Satisfaction with Life",cite:"Diener, Emmons, Larsen & Griffin (1985)",min:1,max:7,anchors:["Strongly disagree","Strongly agree"],rev:[],items:["In most ways my life is close to my ideal.","The conditions of my life are excellent.","I am satisfied with my life.","So far I have gotten the important things I want in life.","If I could live my life over, I would change almost nothing."],score:"sum"},
+ {id:"gse",name:"General Self-Efficacy",cite:"Schwarzer & Jerusalem (1995)",min:1,max:4,anchors:["Not at all true","Exactly true"],rev:[],items:["I can always manage to solve difficult problems if I try hard enough.","If someone opposes me, I can find the means and ways to get what I want.","It is easy for me to stick to my aims and accomplish my goals.","I am confident that I could deal efficiently with unexpected events.","Thanks to my resourcefulness, I know how to handle unforeseen situations.","I can solve most problems if I invest the necessary effort.","I can remain calm when facing difficulties because I can rely on my coping abilities.","When I am confronted with a problem, I can usually find several solutions.","If I am in trouble, I can usually think of a solution.","I can usually handle whatever comes my way."],score:"sum"},
+ {id:"brs",name:"Brief Resilience",cite:"Smith et al. (2008)",min:1,max:5,anchors:["Strongly disagree","Strongly agree"],rev:[1,3,5],items:["I tend to bounce back quickly after hard times.","I have a hard time making it through stressful events.","It does not take me long to recover from a stressful event.","It is hard for me to snap back when something bad happens.","I usually come through difficult times with little trouble.","I tend to take a long time to get over set-backs in my life."],score:"mean"}];
+const WAVES=[["T0","Baseline","Before session one"],["T1","Midpoint","After session four"],["T2","Completion","After session eight"],["T3","Follow-up","60–90 days after completion"]];
+function scoreOf(m,arr){if(!arr||arr.some(v=>v==null))return null;const v=arr.map((x,i)=>m.rev.includes(i)?m.max+m.min-x:x);const s=v.reduce((a,b)=>a+b,0);return m.score==="mean"?+(s/v.length).toFixed(2):s}
+
+/* ===== router ===== */
+let route={v:"home"};
+function go(v,extra={}){route={v,...extra};render();window.scrollTo(0,0)}
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>go(b.dataset.go));
+function render(){const V=$("#view");document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.go===route.v||(route.v==="module"&&b.dataset.go==="sessions")||(route.v==="survey"&&b.dataset.go==="checkins")||(route.v==="fac"&&b.dataset.go==="me")));
+ $("#who").textContent=S.profile?S.profile.id:"";
+ if(!S.profile||!S.profile.signedAt){$("#tabs").style.display="none";V.innerHTML=onboarding();bindOnboarding();return}
+ $("#tabs").style.display="flex";
+ const f={home,sessions,module:moduleView,almanac,checkins,survey,me,fac}[route.v]||home;V.innerHTML=f();bind()}
+
+/* ===== onboarding + agreement ===== */
+function onboarding(){return`<div class="hero" style="aspect-ratio:16/8"><img src="/images/modules/AAPEX_M01.png" alt=""><div class="cap"><b>Welcome to the pilot</b><span>Airman AAPEX · eight sessions · twenty-four modules</span></div></div>
+ <h1>Before we start</h1>
+ <p>This is a voluntary, off-duty personal development program. It is training, not counseling, therapy or an official Air Force program. Your answers stay on this device unless you choose to send them.</p>
+ <h3>YOUR ROLE</h3>
+ <label class="chk"><input type="radio" name="grp" value="cohort" checked> <span><b>Cohort member</b> — I'm attending the sessions.</span></label>
+ <label class="chk"><input type="radio" name="grp" value="comparison"> <span><b>Comparison group</b> — I'm only completing the four short check-ins so the program can be measured fairly.</span></label>
+ <h3>AGREEMENT</h3>
+ <label class="chk"><input type="checkbox" class="ag"> <span>My participation is voluntary and off duty. I can stop at any time with no effect on my career, evaluations or standing.</span></label>
+ <label class="chk"><input type="checkbox" class="ag"> <span>I understand this is educational training, not medical, mental-health or clinical care, and nothing here diagnoses me.</span></label>
+ <label class="chk"><input type="checkbox" class="ag"> <span>I own my written work and my Almanac. Nothing I write leaves this device unless I send it, and I can export or delete it at any time.</span></label>
+ <label class="chk"><input type="checkbox" class="ag"> <span>I agree that my check-in scores may be used, without my name, to measure whether the program works.</span></label>
+ <label class="chk"><input type="checkbox" class="ag"> <span>I won't record or share other participants' stories outside the cohort, and I understand the program materials belong to The Vantage by Langford.</span></label>
+ <label class="chk"><input type="checkbox" id="agRec"> <span>Optional: sessions may be audio-recorded for program improvement. (Leave unchecked to opt out.)</span></label>
+ <label class="q">Full name (signature)</label><input type="text" id="sig" autocomplete="name">
+ <p class="note">Your participant ID is created on this device and is what appears on any data you send.</p>
+ <button class="btn full" id="signBtn">Sign and begin</button>
+ <div class="crisis">If you are struggling right now, talk to someone today: Military Crisis Line — call 988 then press 1, or text 838255. Your chaplain and Military &amp; Family Life Counselor are also available.</div>
+ <details style="margin-top:14px"><summary class="note" style="cursor:pointer">Have a backup code from another device?</summary><textarea class="out" id="restoreIn" placeholder="Paste your AAPEXBK code"></textarea><button class="btn ghost" id="doRestore">Restore</button></details>`}
+function bindOnboarding(){$("#signBtn").onclick=()=>{const all=[...document.querySelectorAll(".ag")].every(c=>c.checked);const sig=$("#sig").value.trim();if(!all){toast("Please confirm each statement");return}if(sig.length<3){toast("Type your full name to sign");return}
+  const id="AX-"+Math.random().toString(36).slice(2,6).toUpperCase()+Math.floor(10+Math.random()*89);
+  S.profile={id,name:sig,group:document.querySelector('input[name=grp]:checked').value,record:$("#agRec").checked,signedAt:new Date().toISOString(),agreementVersion:"pilot-1.0"};save();go(S.profile.group==="comparison"?"checkins":"home")};
+ const dr=$("#doRestore");dr.onclick=()=>{try{const o=JSON.parse(decodeURIComponent(escape(atob($("#restoreIn").value.trim().replace(/^AAPEXBK\./,"")))));S.profile=o.profile;S.entries=o.entries||{};S.checks=o.checks||{};save();toast("Restored");go("home")}catch(e){toast("That code didn't read")}};}
+
+/* ===== home ===== */
+function home(){const p=S.profile;const d=doneN();const t0=S.checks.T0;
+ if(p.group==="comparison")return`<h1>Comparison group</h1><p>Thank you. Your part is four short check-ins across the year. Each takes about five minutes.</p>${waveCards()}`;
+ const next=SESS.find(s=>s.mods.some(n=>!(S.entries[n]||{}).done))||SESS[7];
+ return`<span class="k">PARTICIPANT ${esc(p.id)}</span><h1>Welcome, ${esc(p.name.split(" ")[0])}</h1>
+ ${!t0?`<div class="card" style="border-color:var(--gold)"><b>First step:</b> complete your baseline check-in before session one. It's how this program proves what it does.<div style="margin-top:10px"><button class="btn" data-survey="T0">Start baseline (5 min)</button></div></div>`:""}
+ <h3>YOUR PATH</h3><div class="prog"><i style="width:${d/24*100}%"></i></div><p class="note">${d} of 24 modules recorded in your Almanac</p>
+ <h3>NEXT SESSION</h3>${sessionCard(next)}
+ <h3>DUE REVIEWS</h3>${dueReviews()||'<p class="note">Nothing due. Day 7 and Day 30 reviews appear here after you complete a module.</p>'}
+ <div class="crisis">Training, not counseling. If you are struggling: Military Crisis Line — 988, press 1 · text 838255.</div>`}
+function dueReviews(){const now=Date.now(),out=[];Object.entries(S.entries).forEach(([n,e])=>{if(!e.done)return;[[7,"d7"],[30,"d30"]].forEach(([days,k])=>{if(!e[k]&&now-e.done>=days*864e5)out.push(`<div class="card tap" data-mod="${n}" data-tab="review"><span class="tag warn">DAY ${days}</span> <b>${esc(M(+n).title)}</b><br><span class="note">Retrieval check: answer from memory first.</span></div>`)})});return out.join("")}
+function sessionCard(s){const ph=s.mods.map(n=>(S.entries[n]||{}).done);return`<div class="card"><span class="k">SESSION P${s.k} · ${esc(s.scene).toUpperCase()}</span><div class="mods">${s.mods.map((n,i)=>`<div class="mtile" data-mod="${n}"><img src="${M(n).img}" alt="">${ph[i]?'<span class="seal"></span>':""}<div><span class="k" style="font-size:9px">${PHASES[i][1]}</span><br>${n}. ${esc(M(n).title)}</div></div>`).join("")}</div></div>`}
+
+/* ===== sessions ===== */
+function sessions(){return`<h1>Sessions</h1><p class="note">Eight live sessions. Each pairs one module from every phase around a shared scene: inheritance at dawn, your own work at midday, what outlasts you at dusk.</p>${SESS.map(sessionCard).join("")}`}
+
+/* ===== module ===== */
+function moduleView(){const n=route.n,m=M(n),e=S.entries[n]||(S.entries[n]={fw:[],soc:"",when:"",will:"",law:""});const ph=Math.floor((n-1)/8);const tab=route.tab||"learn";const law=lawFor(n);
+ const tabs=[["learn","Learn"],["work","Field work"],["reflect","Reflect"],["review","Review"]];
+ let body="";
+ if(tab==="learn")body=`<p class="k">THE OBJECTIVE</p><p>${esc(m.dlo)}</p><p class="k">THE ARC</p><p>${esc(m.arc)}</p>${m.quote?`<p class="law" style="font-size:17px">"${esc(m.quote)}"</p>`:""}<p class="k">THE IMAGE</p><p><i>${esc(m.illus)}</i> — ${esc(m.reads)}</p><p class="k">IN SESSION</p><p>Your facilitator teaches this module live. Use the next tabs during and after the session.</p><button class="btn full" data-tab="work">Begin field work →</button>`;
+ if(tab==="work")body=`<p class="k">FIELD WORK · ${esc(m.fieldwork).toUpperCase()}</p>${m.prompts.map((q,i)=>`<label class="q">${i+1}. ${esc(q)}</label><textarea data-fw="${i}">${esc(e.fw[i]||"")}</textarea>`).join("")}<p class="note">Saves as you type. Only you can see this.</p><button class="btn full" data-tab="reflect">Continue to reflection →</button>`;
+ if(tab==="reflect")body=`<p class="k">THE ONE QUESTION</p><p>${esc(m.debrief[0]||"What did this module show you about yourself?")}</p><textarea data-k="soc">${esc(e.soc)}</textarea>
+  <p class="k" style="margin-top:16px">COMMIT · IMPLEMENTATION INTENTION</p><div class="row" style="flex-wrap:nowrap"><span style="flex:none">When</span><input type="text" data-k="when" value="${esc(e.when)}" placeholder="a specific moment"></div><div class="row" style="flex-wrap:nowrap;margin-top:8px"><span style="flex:none">I will</span><input type="text" data-k="will" value="${esc(e.will)}" placeholder="a specific action"></div>
+  <p class="k" style="margin-top:16px">CLOSING LAW</p>${law?`<div class="law">${esc(law)}</div>`:`<p class="note">Delivered live at the end of the session. Write it as you heard it:</p><textarea data-k="law">${esc(e.law)}</textarea>`}
+  <label class="chk" style="margin-top:14px"><input type="checkbox" data-share ${e.share?"checked":""}> <span>Share this module's reflection with my facilitator for a GENE review. (Off by default.)</span></label>
+  <button class="btn full" id="sealBtn" ${e.done?"disabled":""}>${e.done?"Sealed in your Almanac":"Seal this module into my Almanac"}</button>`;
+ if(tab==="review"){const days=e.done?Math.floor((Date.now()-e.done)/864e5):null;body=e.done?`<p class="note">Answer from memory before looking back. Recall is the practice.</p>${[[7,"d7"],[30,"d30"]].map(([d,k])=>`<p class="k">DAY ${d} ${days>=d?"":"· opens in "+(d-days)+" day(s)"}</p>${m.summary.map((q,i)=>`<label class="q">${esc(q)}</label>`).join("")}<textarea data-k="${k}" ${days>=d?"":"disabled"} placeholder="${days>=d?"Your answers…":"Not yet"}">${esc(e[k]||"")}</textarea>`).join("")}`:`<p class="note">Seal the module first. Day 7 and Day 30 reviews open after that.</p>`}
+ return`<button class="back" data-go2="sessions">‹ Sessions</button><div class="hero"><img src="${m.img}" alt=""><div class="cap"><b>${n}. ${esc(m.title)}</b><span>${PHASES[ph][0]} · ${PHASES[ph][1]} · ${esc(m.scene)}</span></div></div>
+ <div class="row" style="margin:12px 0 4px">${tabs.map(([k,l])=>`<button class="btn ${tab===k?"":"ghost"}" data-tab="${k}" style="flex:1;padding:9px 4px;font-size:10.5px">${l}</button>`).join("")}</div>${body}
+ <div class="row" style="margin-top:18px;justify-content:space-between">${n>1?`<button class="btn ghost" data-mod="${n-1}">‹ ${n-1}</button>`:"<span></span>"}${n<24?`<button class="btn ghost" data-mod="${n+1}">${n+1} ›</button>`:""}</div>`}
+
+/* ===== almanac ===== */
+function almanac(){const ids=Object.keys(S.entries).map(Number).filter(n=>S.entries[n].done).sort((a,b)=>a-b);
+ const phaseSeal=k=>[1,2,3,4,5,6,7,8].map(i=>i+k*8).every(n=>(S.entries[n]||{}).done);
+ return`<h1>Your Almanac</h1><p class="note">The record of what you wrote, decided and built. It belongs to you.</p>
+ <div class="row">${PHASES.map((p,k)=>`<span class="tag ${phaseSeal(k)?"ok":""}">${phaseSeal(k)?'<span class="seal gold" style="width:12px;height:12px"></span> ':""}${p[1]}</span>`).join("")}</div>
+ ${ids.length?ids.map(n=>{const e=S.entries[n],m=M(n);return`<div class="card"><span class="seal"></span> <b>${n}. ${esc(m.title)}</b> <span class="note">· sealed ${new Date(e.done).toLocaleDateString()}</span>
+ ${e.soc?`<p><i>${esc(e.soc)}</i></p>`:""}${e.when||e.will?`<p><b>When</b> ${esc(e.when)} <b>I will</b> ${esc(e.will)}</p>`:""}${(lawFor(n)||e.law)?`<p class="note">Law: ${esc(lawFor(n)||e.law)}</p>`:""}<button class="btn ghost" data-mod="${n}">Open</button></div>`}).join(""):`<p class="note">Nothing sealed yet. Each module you complete is sealed here.</p>`}
+ <h3>TAKE IT WITH YOU</h3><div class="row"><button class="btn" id="copyAlm">Copy Almanac as text</button></div>`}
+function almanacText(){let t=`THE ALMANAC — ${S.profile.name} (${S.profile.id})\nAirman AAPEX pilot · The Vantage by Langford\n\n`;Object.keys(S.entries).map(Number).sort((a,b)=>a-b).forEach(n=>{const e=S.entries[n],m=M(n);if(!e.done&&!e.fw.some(Boolean))return;t+=`${n}. ${m.title.toUpperCase()}${e.done?" — sealed "+new Date(e.done).toLocaleDateString():""}\n`;m.prompts.forEach((q,i)=>{if(e.fw[i])t+=`  ${i+1}) ${q}\n     ${e.fw[i]}\n`});if(e.soc)t+=`  Reflection: ${e.soc}\n`;if(e.when||e.will)t+=`  When ${e.when}, I will ${e.will}\n`;if(lawFor(n)||e.law)t+=`  Closing Law: ${lawFor(n)||e.law}\n`;if(e.d7)t+=`  Day 7: ${e.d7}\n`;if(e.d30)t+=`  Day 30: ${e.d30}\n`;t+="\n"});return t}
+
+/* ===== check-ins ===== */
+function waveCards(){return WAVES.map(([w,l,when])=>{const c=S.checks[w];return`<div class="card"><div class="row" style="justify-content:space-between"><div><b>${w} · ${l}</b><br><span class="note">${when}</span></div>${c?'<span class="tag ok">DONE</span>':""}</div>
+ ${c?`<p class="note">${MEASURES.map(m=>`${m.name}: ${scoreOf(m,c[m.id])}`).join(" · ")}</p><button class="btn ghost" data-send="${w}">Send to facilitator</button>`:`<button class="btn" data-survey="${w}" style="margin-top:8px">Start (≈5 min)</button>`}</div>`}).join("")}
+function checkins(){return`<h1>Check-ins</h1><p>Four short check-ins measure change across the year, for you and the comparison group. There are no right answers; answer for how things are now.</p>${waveCards()}`}
+function survey(){const w=route.w;const cur=S._draft&&S._draft.w===w?S._draft:(S._draft={w,swls:[],gse:[],brs:[]});
+ return`<button class="back" data-go2="checkins">‹ Check-ins</button><h1>${w} · ${WAVES.find(x=>x[0]===w)[1]}</h1>
+ ${MEASURES.map(m=>`<h3>${m.name.toUpperCase()}</h3><p class="note">${m.min}=${m.anchors[0]} · ${m.max}=${m.anchors[1]}</p>${m.items.map((it,i)=>`<label class="q">${i+1}. ${esc(it)}</label><div class="scale">${Array.from({length:m.max-m.min+1},(_,j)=>j+m.min).map(v=>`<label><input type="radio" name="${m.id}${i}" value="${v}" data-m="${m.id}" data-i="${i}" ${cur[m.id][i]===v?"checked":""}><span>${v}</span></label>`).join("")}</div>`).join("")}`).join("")}
+ <button class="btn full" id="subSurvey" style="margin-top:18px">Save check-in</button><p class="note">Scales: ${MEASURES.map(m=>m.name+" — "+m.cite).join("; ")}.</p>`}
+function sendCode(w){const c=S.checks[w];const payload={v:1,id:S.profile.id,g:S.profile.group,w,at:c.at,r:{swls:c.swls,gse:c.gse,brs:c.brs},done:Object.keys(S.entries).filter(n=>S.entries[n].done).map(Number)};
+ const shared={};Object.entries(S.entries).forEach(([n,e])=>{if(e.share&&e.done)shared[n]={soc:e.soc,when:e.when,will:e.will}});if(Object.keys(shared).length)payload.sh=shared;
+ return"AAPEX1."+btoa(unescape(encodeURIComponent(JSON.stringify(payload))))}
+
+/* ===== more / profile / backup ===== */
+function me(){const p=S.profile;return`<h1>More</h1><div class="card"><span class="k">PARTICIPANT</span><p><b>${esc(p.name)}</b> · ${esc(p.id)} · ${p.group==="cohort"?"Cohort":"Comparison group"}<br><span class="note">Signed ${new Date(p.signedAt).toLocaleDateString()} · audio recording ${p.record?"allowed":"declined"}</span></p></div>
+ <h3>BACKUP · MOVE TO ANOTHER DEVICE</h3><p class="note">Your work lives in this browser. Copy a backup code now and then, and keep it in your notes. Paste it on a new device to restore.</p>
+ <div class="row"><button class="btn" id="mkBackup">Create backup code</button></div><textarea class="out" id="backupOut" placeholder="Backup code appears here" readonly></textarea>
+ <label class="q">Restore from a backup code</label><textarea class="out" id="restoreIn" placeholder="Paste a backup code"></textarea><button class="btn ghost" id="doRestore">Restore</button>
+ <h3>PRIVACY</h3><button class="btn ghost" id="wipe">Delete everything on this device</button>
+ <h3>FACILITATOR</h3><button class="btn ghost" data-go2="fac">Facilitator tools</button>
+ <div class="crisis">Training, not counseling. If you are struggling: Military Crisis Line — call 988 then press 1 · text 838255.</div>`}
+
+/* ===== facilitator ===== */
+function fac(){if(!S.fac.unlocked)return`<button class="back" data-go2="me">‹ More</button><h1>Facilitator tools</h1>${S.fac.pin?`<label class="q">PIN</label><input type="password" id="pinIn" inputmode="numeric"><button class="btn full" id="pinGo" style="margin-top:10px">Open</button>`:`<p>Set a PIN for this device. It keeps participants out of the facilitator view on a shared device; it is not encryption.</p><input type="password" id="pinSet" inputmode="numeric" placeholder="4–8 digits"><button class="btn full" id="pinSave" style="margin-top:10px">Set PIN</button>`}`;
+ const sub=route.sub||"data";
+ return`<button class="back" data-go2="me">‹ More</button><h1>Facilitator tools</h1><div class="row">${[["data","Outcomes"],["run","Run sheets"],["laws","Closing Laws"]].map(([k,l])=>`<button class="btn ${sub===k?"":"ghost"}" data-sub="${k}" style="flex:1;font-size:10.5px">${l}</button>`).join("")}</div>${sub==="data"?facData():sub==="run"?facRun():facLaws()}<p style="margin-top:20px"><button class="btn ghost" id="lock">Lock</button></p>`}
+function parseCodes(txt){const out=[];(txt.match(/AAPEX1\.[A-Za-z0-9+/=]+/g)||[]).forEach(c=>{try{out.push(JSON.parse(decodeURIComponent(escape(atob(c.slice(7))))))}catch(e){}});return out}
+function facData(){const recs=S.fac.imports;const latest={};recs.forEach(r=>{latest[r.id+"|"+r.w]=r});const rows=Object.values(latest);
+ const stat=(g,w,m)=>{const v=rows.filter(r=>r.g===g&&r.w===w).map(r=>scoreOf(m,r.r[m.id])).filter(x=>x!=null);if(!v.length)return null;const mean=v.reduce((a,b)=>a+b,0)/v.length;const sd=Math.sqrt(v.reduce((a,b)=>a+(b-mean)**2,0)/Math.max(1,v.length-1));return{n:v.length,mean,sd}};
+ const f=x=>x==null?"—":x.toFixed(2);
+ let t=`<h3>IMPORT CHECK-IN CODES</h3><p class="note">Participants send codes from Check-ins → Send to facilitator. Paste any number at once; repeats are de-duplicated.</p><textarea class="out" id="impIn" placeholder="Paste AAPEX1.… codes"></textarea><button class="btn" id="impGo">Import</button>
+ <h3>RECEIVED (${rows.length})</h3><table><tr><th>ID</th><th>Group</th><th>Wave</th>${MEASURES.map(m=>`<th>${m.id.toUpperCase()}</th>`).join("")}<th>Mods</th></tr>${rows.sort((a,b)=>(a.id+a.w).localeCompare(b.id+b.w)).map(r=>`<tr><td>${esc(r.id)}</td><td>${r.g==="cohort"?"C":"Cmp"}</td><td>${r.w}</td>${MEASURES.map(m=>`<td>${scoreOf(m,r.r[m.id])??"—"}</td>`).join("")}<td>${(r.done||[]).length}</td></tr>`).join("")}</table>
+ <h3>GROUP MEANS</h3><table><tr><th>Measure</th><th>Wave</th><th>Cohort</th><th>Comparison</th></tr>`;
+ MEASURES.forEach(m=>WAVES.forEach(([w])=>{const a=stat("cohort",w,m),b=stat("comparison",w,m);if(a||b)t+=`<tr><td>${m.name}</td><td>${w}</td><td>${a?f(a.mean)+" (n="+a.n+")":"—"}</td><td>${b?f(b.mean)+" (n="+b.n+")":"—"}</td></tr>`}));
+ t+=`</table><h3>EFFECT (T0 → LATEST WAVE)</h3><table><tr><th>Measure</th><th>Diff-in-diff</th><th>Cohen's d (cohort change)</th></tr>`;
+ MEASURES.forEach(m=>{const lw=["T3","T2","T1"].find(w=>stat("cohort",w,m));if(!lw||!stat("cohort","T0",m)){t+=`<tr><td>${m.name}</td><td colspan="2" class="note">Needs T0 and a later wave</td></tr>`;return}
+  const c0=stat("cohort","T0",m),c1=stat("cohort",lw,m),k0=stat("comparison","T0",m),k1=stat("comparison",lw,m);const did=(k0&&k1)?(c1.mean-c0.mean)-(k1.mean-k0.mean):null;const pooled=Math.sqrt((c0.sd**2+c1.sd**2)/2)||null;const d=pooled?(c1.mean-c0.mean)/pooled:null;
+  t+=`<tr><td>${m.name} (${lw})</td><td>${did==null?"needs comparison data":f(did)}</td><td>${d==null?"—":f(d)}</td></tr>`});
+ t+=`</table><p class="note">Small samples: report n, attrition and limits next to every number. d ≈ 0.2 small, 0.5 medium, 0.8 large.</p><h3>EXPORT</h3><button class="btn" id="csvGo">Copy CSV</button>`;
+ const sh=rows.filter(r=>r.sh);if(sh.length)t+=`<h3>SHARED REFLECTIONS FOR GENE REVIEW</h3>${sh.map(r=>Object.entries(r.sh).map(([n,x])=>`<div class="card"><b>${esc(r.id)} · ${n}. ${esc(M(+n).title)}</b><p>${esc(x.soc)}</p>${x.when?`<p class="note">When ${esc(x.when)}, I will ${esc(x.will)}</p>`:""}</div>`).join("")).join("")}<p class="note">Paste these into GENE for the Socratic read. Never share outside the facilitator role.</p>`;
+ return t}
+function facRun(){const k=route.s||1;const s=SESS[k-1];const notes=S.fac.notes[k]||{};
+ return`<div class="row" style="margin-top:10px">${SESS.map(x=>`<button class="btn ${x.k===k?"":"ghost"}" data-sess="${x.k}" style="padding:8px 10px;font-size:11px">P${x.k}</button>`).join("")}</div>
+ <h2>Session P${k} · ${esc(s.scene)}</h2><p class="note">Three modules, about 66 minutes each, with breaks inside a 4-hour block.</p>
+ ${s.mods.map((n,i)=>{const m=M(n);return`<div class="card"><span class="k">${PHASES[i][0]} · ${PHASES[i][1]}</span><h2 style="margin-top:4px">${n}. ${esc(m.title)}</h2><p><b>DLO:</b> ${esc(m.dlo)}</p><p><b>Materials:</b> ${esc(m.materials)}</p><p><b>Field work:</b> ${esc(m.fieldwork)} (${m.prompts.length} prompts)</p><p><b>Debrief:</b></p><ul>${m.debrief.map(q=>`<li>${esc(q)}</li>`).join("")}</ul>
+  <p><b>Closing Law:</b> ${lawFor(n)?`<span class="tag ok">AUTHORED</span> ${esc(lawFor(n))}`:`<span class="tag warn">NOT YET AUTHORED</span> write it in Closing Laws before this session`}</p>
+  <p><b>Self-debrief (after, not read aloud):</b></p>${m.selfdebrief.map((q,j)=>`<label class="q" style="font-size:15px">${esc(q)}</label><textarea data-note="${k}.${n}.${j}" style="min-height:54px">${esc(notes[n+"."+j]||"")}</textarea>`).join("")}</div>`}).join("")}
+ <h3>FIDELITY CHECK</h3>${["Every module delivered as written, at the stated time","Closing Laws delivered verbatim","Field work completed in session","No clinical or diagnostic language used","Participants reminded their writing is private"].map((q,j)=>`<label class="chk"><input type="checkbox" data-fid="${k}.${j}" ${notes["f"+j]?"checked":""}> <span>${q}</span></label>`).join("")}`}
+function facLaws(){return`<p class="note">AI never authors Closing Laws. The compendium holds a draft for each module; edit it into your own words and save. Participants see only what you save here, and only on this device unless you send it out with the app update.</p>
+ ${MODS.map(m=>{const saved=lawFor(m.n);return`<div class="card"><b>${m.n}. ${esc(m.title)}</b> ${saved?'<span class="tag ok">AUTHORED</span>':'<span class="tag warn">DRAFT</span>'}${!saved?`<div class="draft" style="margin:8px 0"><span class="k">COMPENDIUM DRAFT — NOT FOR DELIVERY AS-IS</span><br>${esc(m.closing_draft)}</div>`:""}<textarea data-law="${m.n}" placeholder="Your Closing Law, in your words">${esc(saved)}</textarea><button class="btn ghost" data-lawsave="${m.n}" style="margin-top:6px">Save as authored</button></div>`}).join("")}
+ <h3>SHIP TO PARTICIPANTS</h3><p class="note">Copy this block and send it to Claude; it goes into the app so every participant's device shows your laws.</p><button class="btn" id="lawExport">Copy authored laws</button>`}
+
+/* ===== bindings ===== */
+function bind(){const V=$("#view");
+ V.querySelectorAll("[data-mod]").forEach(el=>el.onclick=e=>{e.stopPropagation();go("module",{n:+el.dataset.mod,tab:el.dataset.tab||"learn"})});
+ V.querySelectorAll("[data-tab]").forEach(el=>{if(el.dataset.mod)return;el.onclick=()=>go("module",{n:route.n,tab:el.dataset.tab})});
+ V.querySelectorAll("[data-go2]").forEach(el=>el.onclick=()=>go(el.dataset.go2));
+ V.querySelectorAll("[data-survey]").forEach(el=>el.onclick=()=>go("survey",{w:el.dataset.survey}));
+ if(route.v==="module"){const e=S.entries[route.n];let tm;const sv=()=>{clearTimeout(tm);tm=setTimeout(save,300)};
+  V.querySelectorAll("[data-fw]").forEach(t=>t.oninput=()=>{e.fw[+t.dataset.fw]=t.value;sv()});
+  V.querySelectorAll("[data-k]").forEach(t=>t.oninput=()=>{e[t.dataset.k]=t.value;sv()});
+  const sh=V.querySelector("[data-share]");if(sh)sh.onchange=()=>{e.share=sh.checked;save()};
+  const sb=$("#sealBtn");if(sb)sb.onclick=()=>{if(!e.fw.some(x=>x&&x.trim())&&!e.soc){toast("Write at least one answer first");return}e.done=Date.now();save();toast("Sealed in your Almanac");go("module",{n:route.n,tab:"reflect"})}}
+ if(route.v==="survey"){V.querySelectorAll("input[type=radio][data-m]").forEach(r=>r.onchange=()=>{S._draft[r.dataset.m][+r.dataset.i]=+r.value});
+  $("#subSurvey").onclick=()=>{const d=S._draft;const missing=MEASURES.some(m=>m.items.some((_,i)=>d[m.id][i]==null));if(missing){toast("Answer every item");return}S.checks[d.w]={swls:d.swls,gse:d.gse,brs:d.brs,at:new Date().toISOString()};S._draft=null;save();toast("Check-in saved");go("checkins")}}
+ V.querySelectorAll("[data-send]").forEach(b=>b.onclick=()=>{const code=sendCode(b.dataset.send);showCopy("Send this code to your facilitator by text or email. It holds your scores and participant ID, not your name, and only the reflections you chose to share.",code)});
+ const ca=$("#copyAlm");if(ca)ca.onclick=()=>showCopy("Your Almanac as text.",almanacText());
+ const mb=$("#mkBackup");if(mb)mb.onclick=()=>{const c="AAPEXBK."+btoa(unescape(encodeURIComponent(JSON.stringify({profile:S.profile,entries:S.entries,checks:S.checks}))));$("#backupOut").value=c;copy(c)};
+ const dr=$("#doRestore");if(dr)dr.onclick=()=>{const v=$("#restoreIn").value.trim();try{const o=JSON.parse(decodeURIComponent(escape(atob(v.replace(/^AAPEXBK\./,"")))));S.profile=o.profile;S.entries=o.entries||{};S.checks=o.checks||{};save();toast("Restored");go("home")}catch(e){toast("That code didn't read")}};
+ const wp=$("#wipe");if(wp)wp.onclick=()=>{if(wp.dataset.arm){S={profile:null,entries:{},checks:{},fac:{imports:[],notes:{},laws:{}}};save();go("home")}else{wp.dataset.arm=1;wp.textContent="Tap again to delete everything"}};
+ const ps=$("#pinSave");if(ps)ps.onclick=()=>{const v=$("#pinSet").value;if(!/^\d{4,8}$/.test(v)){toast("4–8 digits");return}S.fac.pin=v;S.fac.unlocked=true;save();render()};
+ const pg=$("#pinGo");if(pg)pg.onclick=()=>{if($("#pinIn").value===S.fac.pin){S.fac.unlocked=true;render()}else toast("Wrong PIN")};
+ const lk=$("#lock");if(lk)lk.onclick=()=>{S.fac.unlocked=false;save();go("me")};
+ V.querySelectorAll("[data-sub]").forEach(b=>b.onclick=()=>go("fac",{sub:b.dataset.sub}));
+ V.querySelectorAll("[data-sess]").forEach(b=>b.onclick=()=>go("fac",{sub:"run",s:+b.dataset.sess}));
+ const ig=$("#impGo");if(ig)ig.onclick=()=>{const recs=parseCodes($("#impIn").value);if(!recs.length){toast("No codes found");return}S.fac.imports.push(...recs);save();toast(recs.length+" imported");render()};
+ const cg=$("#csvGo");if(cg)cg.onclick=()=>{const head=["id","group","wave","at",...MEASURES.map(m=>m.id),...MEASURES.flatMap(m=>m.items.map((_,i)=>m.id+"_"+(i+1))),"modules_done"];const rows=[head.join(",")];const latest={};S.fac.imports.forEach(r=>latest[r.id+"|"+r.w]=r);Object.values(latest).forEach(r=>rows.push([r.id,r.g,r.w,r.at,...MEASURES.map(m=>scoreOf(m,r.r[m.id])),...MEASURES.flatMap(m=>r.r[m.id]),(r.done||[]).length].join(",")));showCopy("CSV — paste into a spreadsheet.",rows.join("\n"))};
+ V.querySelectorAll("[data-note]").forEach(t=>t.oninput=()=>{const [k,n,j]=t.dataset.note.split(".");(S.fac.notes[k]=S.fac.notes[k]||{})[n+"."+j]=t.value;save()});
+ V.querySelectorAll("[data-fid]").forEach(c=>c.onchange=()=>{const [k,j]=c.dataset.fid.split(".");(S.fac.notes[k]=S.fac.notes[k]||{})["f"+j]=c.checked;save()});
+ V.querySelectorAll("[data-lawsave]").forEach(b=>b.onclick=()=>{const n=b.dataset.lawsave;const v=V.querySelector(`[data-law="${n}"]`).value.trim();if(v)S.fac.laws[n]=v;else delete S.fac.laws[n];save();toast("Saved");render()});
+ const le=$("#lawExport");if(le)le.onclick=()=>showCopy("Send to Claude to ship these laws in the app:","APPROVED_LAWS="+JSON.stringify(S.fac.laws,null,1));
+}
+function copy(t){try{navigator.clipboard.writeText(t).then(()=>toast("Copied"),()=>toast("Select and copy"))}catch(e){toast("Select and copy")}}
+function showCopy(msg,text){const V=$("#view");const box=document.createElement("div");box.className="card";box.style.borderColor="var(--gold)";box.innerHTML=`<p>${esc(msg)}</p><textarea class="out" readonly>${esc(text)}</textarea><div class="row" style="margin-top:8px"><button class="btn">Copy</button><button class="btn ghost">Close</button></div>`;V.prepend(box);window.scrollTo(0,0);const [c,x]=box.querySelectorAll("button");c.onclick=()=>{box.querySelector("textarea").select();copy(text)};x.onclick=()=>box.remove()}
+render();
+</script>
+</body>
+</html>
