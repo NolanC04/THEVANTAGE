@@ -39,6 +39,7 @@ export default async function Library({ searchParams }: { searchParams: Promise<
               {k.label}
             </Link>
           ))}
+          <Link href="/library/frameworks" style={{ color: "var(--color-muted)" }}>Frameworks →</Link>
         </nav>
         {items.length === 0 ? (
           <p className="body mt-12 rule-top pt-8">Nothing on this shelf yet. New pieces arrive as Nolan releases them from the studio.</p>

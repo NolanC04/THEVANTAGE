@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { postJSON } from "@/lib/airman/fetchWithRetry";
 import type { Slide } from "@/lib/airman/slides";
@@ -28,7 +28,7 @@ function useAction() {
   return { busy, err, run };
 }
 
-export function Player(props: { n: number; code: string; image: string | null; phase: string; session: number; slides: Slide[]; content: ModuleContent; entry: Entry; closingLaw: string | null }) {
+export function Player(props: { n: number; code: string; image: string | null; phase: string; session: number; slides: Slide[]; content: ModuleContent; entry: Entry; closingLaw: string | null; practice?: ReactNode }) {
   const { n, slides, content, entry } = props;
   const [i, setI] = useState(entry.bridge_at && slides.length > 8 ? 8 : 0);
   const s = slides[i];
@@ -192,6 +192,7 @@ export function Player(props: { n: number; code: string; image: string | null; p
         )}
         {act.err && <p role="alert" className="err">{act.err}</p>}
       </div>
+      {props.practice && <div style={{ marginTop: 20 }}>{props.practice}</div>}
     </main>
   );
 }
