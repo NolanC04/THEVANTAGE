@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Airman AAPEX · Log in</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&amp;family=EB+Garamond:ital,wght@0,400;0,500;1,400&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F3A2E}a:hover{color:#141413}
+.ap-in{box-sizing:border-box;width:100%;min-height:52px;padding:12px 14px;border:1px solid #BFB39C;border-radius:12px;background:#FBF8F2;font:16px Inter,system-ui,sans-serif;color:#141413}
+.ap-in:focus{outline:2px solid #1F3A2E;outline-offset:1px}
+.ap-btn{display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:100%;min-height:54px;border:0;border-radius:12px;background:#1F3A2E;color:#F7F2E8;font:600 16px Inter,system-ui,sans-serif;text-decoration:none;cursor:pointer}
+.ap-btn:hover{color:#F7F2E8;background:#18302A}
+.ap-off{display:flex;align-items:center;justify-content:center;width:100%;min-height:54px;border:0;border-radius:12px;background:#B8B2A4;color:#4A4A44;font:600 16px Inter,system-ui,sans-serif;cursor:not-allowed}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #EEE7D8; color: #141413; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column; padding: 56px 28px 28px; gap: 18px; overflow-y: auto">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 0 12px">
+<svg width="56" height="64" viewBox="0 0 56 64" aria-hidden="true"><path d="M28 2 L52 12 V32 C52 47 41 57 28 62 C15 57 4 47 4 32 V12 Z" fill="none" stroke="#1F3A2E" stroke-width="2.5"/><path d="M28 16 L38 44 H18 Z" fill="none" stroke="#1F3A2E" stroke-width="2"/></svg>
+<div style="font-family: Cinzel, serif; font-weight: 700; font-size: 32px; letter-spacing: 6px; color: #1F3A2E">AAPEX</div>
+<div style="font-family: 'EB Garamond', serif; font-style: italic; font-size: 17px; color: #4A4A44">by {{ byline }}</div>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: #2B2B27">Invite code
+<input class="ap-in" value="{{ code }}" onChange="{{ onCode }}" placeholder="e.g. DEMO-PILOT" autocomplete="off">
+</label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: #2B2B27">Email
+<input class="ap-in" type="email" value="{{ email }}" onChange="{{ onEmail }}" placeholder="you@example.com">
+</label>
+<label style="display: flex; gap: 12px; align-items: flex-start; font-size: 14px; line-height: 1.45; cursor: pointer">
+<input type="checkbox" checked="{{ agreed }}" onChange="{{ toggleAgree }}" style="width: 22px; height: 22px; accent-color: #1F3A2E; flex-shrink: 0; margin-top: 1px">
+<span>I agree to the pilot consent: my Almanac is mine to export or delete, GENE never sees my name or email, and quick-check answers may show on the room screen with names.</span>
+</label>
+<sc-if value="{{ ready }}" hint-placeholder-val="{{ false }}">
+<a class="ap-btn" href="Learner-Modules.dc.html">Enter</a>
+</sc-if>
+<sc-if value="{{ notReady }}" hint-placeholder-val="{{ true }}">
+<button class="ap-off" disabled="{{ true }}">Enter</button>
+</sc-if>
+<div style="flex: 1"></div>
+<div style="font-size: 12px; line-height: 1.5; color: #4A4A44; text-align: center">Returning? Your one-tap email link opens your modules directly. Facilitators and admins sign in here too and switch views from the menu.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"byline":{"editor":"enum","options":["The Vantage"],"default":"The Vantage"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { code: '', email: '', agreed: false }; }
+  renderVals() {
+    const s = this.state;
+    const ok = !!(s.code.trim() && s.email.indexOf('@') > 0 && s.agreed);
+    return {
+      byline: this.props.byline ?? 'The Vantage',
+      code: s.code, email: s.email, agreed: s.agreed,
+      onCode: (e) => this.setState({ code: e.target.value.toUpperCase() }),
+      onEmail: (e) => this.setState({ email: e.target.value }),
+      toggleAgree: () => this.setState({ agreed: !s.agreed }),
+      ready: ok, notReady: !ok
+    };
+  }
+}
+</script>
+</body>
+</html>

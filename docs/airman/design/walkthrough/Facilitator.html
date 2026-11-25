@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Airman AAPEX · Facilitator version</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&amp;family=EB+Garamond:ital,wght@0,400;0,500;1,400&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F3A2E}a:hover{color:#141413}
+.fc-tab{display:flex;align-items:center;min-height:44px;width:100%;border:0;border-radius:10px;background:transparent;color:#2B2B27;font:500 14px Inter,system-ui,sans-serif;text-align:left;padding:0 12px;cursor:pointer}
+.fc-btn{min-height:44px;border:0;border-radius:10px;background:#1F3A2E;color:#F7F2E8;font:600 14px Inter,system-ui,sans-serif;cursor:pointer;padding:0 16px}
+.fc-btn:disabled{background:#B8B2A4;color:#4A4A44;cursor:not-allowed}
+.fc-ghost{min-height:44px;border:1px solid #1F3A2E;border-radius:10px;background:transparent;color:#1F3A2E;font:600 14px Inter,system-ui,sans-serif;cursor:pointer;padding:0 14px}
+.fc-ghost:disabled{border-color:#B8B2A4;color:#6E6A60;cursor:not-allowed}
+.fc-card{background:#F7F2E8;border:1px solid #D6CCB8;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.fc-h{font:700 20px Cinzel,serif;color:#1F3A2E;margin:0}
+.fc-k{font:600 12px Inter,sans-serif;letter-spacing:1.5px;color:#4A4A44}
+.fc-mod{min-height:44px;border-radius:10px;font:600 13px Inter,sans-serif;cursor:pointer}
+.fc-in{box-sizing:border-box;width:100%;min-height:44px;padding:10px 12px;border:1px solid #BFB39C;border-radius:10px;background:#FBF8F2;font:15px Inter,sans-serif;color:#141413}
+.fc-td{padding:10px 8px;border-bottom:1px solid #E3DACA;font-size:14px}
+.fc-th{padding:10px 8px;border-bottom:1px solid #D6CCB8;text-align:left;color:#4A4A44;font:600 12px Inter,sans-serif;letter-spacing:1px}
+.fc-role{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border-radius:20px;border:1px solid #F7F2E8;background:transparent;color:#F7F2E8;font:600 13px Inter,sans-serif;cursor:pointer}
+.fc-role-item{display:flex;align-items:center;justify-content:space-between;min-height:44px;padding:0 14px;color:#141413;text-decoration:none;font:500 14px Inter,sans-serif}
+.fc-role-item:hover{background:#EEE7D8;color:#141413}
+</style>
+</helmet>
+<div style="min-height: 1040px; box-sizing: border-box; background: #EEE7D8; color: #141413; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column">
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 28px; background: #1F3A2E; color: #F7F2E8">
+<div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap">
+<div style="font-family: Cinzel, serif; font-weight: 700; font-size: 20px; letter-spacing: 4px">AAPEX</div>
+<span style="font-size: 11px; font-weight: 600; letter-spacing: 2px; background: #F7F2E8; color: #1F3A2E; border-radius: 6px; padding: 4px 8px">FACILITATOR VERSION</span>
+</div>
+<div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap">
+<span style="font-size: 13px">{{ flagBadge }}</span>
+<div style="position: relative">
+<button class="fc-role" onClick="{{ toggleRole }}" aria-expanded="{{ roleExpanded }}" aria-haspopup="true">View: Facilitator<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
+<sc-if value="{{ roleOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; right: 0; top: 48px; width: 220px; background: #FBF8F2; border: 1px solid #BFB39C; border-radius: 12px; overflow: hidden; z-index: 5; box-shadow: 0 8px 24px rgba(20,20,19,0.2)">
+<a class="fc-role-item" href="Facilitator.dc.html" aria-current="page" style="font-weight: 600">Facilitator<span aria-hidden="true">✓</span></a>
+<a class="fc-role-item" href="Learner-Modules.dc.html">Learner</a>
+<a class="fc-role-item" href="Admin.dc.html">Admin</a>
+<div style="padding: 8px 14px 10px; font-size: 11px; line-height: 1.4; color: #4A4A44; border-top: 1px solid #E3DACA">Admin appears only if an admin granted you that access.</div>
+</div>
+</sc-if>
+</div>
+</div>
+</header>
+<div style="flex: 1; display: flex; flex-wrap: wrap; gap: 24px; padding: 24px 28px; align-items: flex-start">
+<nav aria-label="Facilitator" style="flex: 1 1 200px; max-width: 240px; display: flex; flex-direction: column; gap: 4px">
+<sc-for list="{{ tabs }}" as="t" hint-placeholder-count="6">
+<button class="fc-tab" onClick="{{ t.go }}" style="background: {{ t.bg }}; color: {{ t.fg }}">{{ t.label }}</button>
+</sc-for>
+<div style="font-size: 12px; line-height: 1.5; color: #4A4A44; padding: 12px">Every view of learner data writes to the audit log.</div>
+<div style="border: 1px solid #BFB39C; border-radius: 12px; padding: 12px; font-size: 12px; line-height: 1.5; color: #2B2B27; margin: 0 4px">
+<div style="font-weight: 600; margin-bottom: 4px">Warm handoff</div>
+Chaplain · MFLC · Embedded mental health · M&amp;FRC<br>[Malmstrom contacts]
+</div>
+</nav>
+<main style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+
+<sc-if value="{{ isClasses }}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div class="fc-card">
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px"><h1 class="fc-h">Classes</h1><span style="font-size: 13px; color: #4A4A44">{{ classCount }} active</span></div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{ classChips }}" as="c" hint-placeholder-count="1">
+<button class="fc-mod" onClick="{{ c.go }}" style="padding: 0 14px; background: {{ c.bg }}; color: {{ c.fg }}; border: 1px solid #1F3A2E">{{ c.name }}</button>
+</sc-for>
+</div>
+<div style="font-size: 14px; color: #2B2B27">{{ classLine }}</div>
+<div style="overflow-x: auto">
+<table style="width: 100%; border-collapse: collapse; min-width: 620px">
+<thead><tr><th class="fc-th">SESSION</th><th class="fc-th">DATE</th><th class="fc-th">MODULES</th><th class="fc-th">FOCUS SKILL</th><th class="fc-th">STATUS</th></tr></thead>
+<tbody>
+<sc-for list="{{ sessions }}" as="r" hint-placeholder-count="8">
+<tr><td class="fc-td" style="font-weight: 600">{{ r.p }}</td><td class="fc-td">[date]</td><td class="fc-td">{{ r.mods }}</td><td class="fc-td">{{ r.focus }}</td><td class="fc-td">{{ r.status }}</td></tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+</div>
+<div class="fc-card">
+<h2 class="fc-h" style="font-size: 17px">New class</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end">
+<label style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Class name<input class="fc-in" value="{{ newClass }}" onChange="{{ onNewClass }}" placeholder="e.g. Cohort 2 · [month]"></label>
+<button class="fc-btn" disabled="{{ addClassDisabled }}" onClick="{{ addClass }}">Create class with 8 sessions</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isAssign }}" hint-placeholder-val="{{ false }}">
+<div class="fc-card">
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px"><h1 class="fc-h">Assign work</h1><span style="font-size: 13px; color: #4A4A44">To: {{ className }} · {{ unlockCount }} of 24 open</span></div>
+<div class="fc-k">ASSIGN A WHOLE SESSION</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{ quick }}" as="q" hint-placeholder-count="8">
+<button class="fc-ghost" onClick="{{ q.go }}">{{ q.label }}</button>
+</sc-for>
+</div>
+<label style="display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px; cursor: pointer"><input type="checkbox" checked="{{ dailyOn }}" onChange="{{ toggleDaily }}" style="width: 20px; height: 20px; accent-color: #1F3A2E">Daily reps on between sessions for this class</label>
+<div class="fc-k">OR OPEN MODULES ONE BY ONE</div>
+<sc-for list="{{ phases }}" as="p" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 12px; color: #4A4A44">PHASE {{ p.n }}</div>
+<div style="display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{ p.mods }}" as="m" hint-placeholder-count="8">
+<button class="fc-mod" onClick="{{ m.toggle }}" aria-pressed="{{ m.on }}" style="background: {{ m.bg }}; color: {{ m.fg }}; border: {{ m.border }}">{{ m.code }}</button>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ isPeople }}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div class="fc-card">
+<h1 class="fc-h">People &amp; roles</h1>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end">
+<label style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Invite by email<input class="fc-in" value="{{ invEmail }}" onChange="{{ onInvEmail }}" placeholder="airman@example.com"></label>
+<div style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Class<button class="fc-ghost" onClick="{{ cycleInvClass }}">{{ invClassName }}</button></div>
+<div style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Role<button class="fc-ghost" onClick="{{ cycleInvRole }}" style="min-width: 200px">{{ invRoleName }}</button></div>
+<button class="fc-btn" disabled="{{ inviteDisabled }}" onClick="{{ invite }}">Send invite</button>
+</div>
+<sc-if value="{{ hasInvMsg }}" hint-placeholder-val="{{ false }}">
+<div style="background: #DDE6DC; color: #1F3A2E; border-radius: 10px; padding: 10px 14px; font-size: 14px">{{ invMsg }}</div>
+</sc-if>
+<div style="overflow-x: auto">
+<table style="width: 100%; border-collapse: collapse; min-width: 640px">
+<thead><tr><th class="fc-th">PERSON</th><th class="fc-th">CLASS</th><th class="fc-th">DAILY REPS</th><th class="fc-th">ROLE (TAP TO CHANGE)</th></tr></thead>
+<tbody>
+<sc-for list="{{ roster }}" as="r" hint-placeholder-count="5">
+<tr><td class="fc-td">{{ r.id }}</td><td class="fc-td">{{ r.cls }}</td><td class="fc-td">[n]</td><td class="fc-td" style="padding: 6px 8px"><button class="fc-ghost" onClick="{{ r.cycle }}" style="min-width: 210px">{{ r.role }}</button></td></tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div style="font-size: 12px; line-height: 1.5; color: #4A4A44">Assistants see run sheets and can open quick checks, never responses, GENE notes or safety flags. Comparison members only do check-ins. Daily reps show as counts, never text. Only an admin can grant facilitator or admin access.</div>
+</div>
+<div class="fc-card">
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px"><h2 class="fc-h" style="font-size: 17px">Nominations</h2><span style="font-size: 13px; color: #4A4A44">{{ nomCount }} pending</span></div>
+<sc-for list="{{ noms }}" as="n" hint-placeholder-count="1">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #D6CCB8; border-radius: 12px; padding: 12px 14px; background: #FBF8F2">
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">{{ n.name }}</span><span style="font-size: 13px; color: #4A4A44">{{ n.by }} · {{ n.reason }}</span></div>
+<div style="display: flex; gap: 8px"><button class="fc-btn" onClick="{{ n.admit }}">Admit · invite</button><button class="fc-ghost" onClick="{{ n.decline }}">Decline</button></div>
+</div>
+</sc-for>
+<sc-if value="{{ noNoms }}" hint-placeholder-val="{{ false }}">
+<div style="font-size: 14px; color: #4A4A44">No pending nominations. Declined nominations are deleted.</div>
+</sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isLive }}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div class="fc-card" style="border: 2px solid #1F3A2E">
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px"><h1 class="fc-h">Run sheet · P1</h1><span class="fc-k">{{ sessionState }}</span></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 4px"><span class="fc-k">YOU OPEN WITH</span><span style="font-family: 'EB Garamond', serif; font-size: 16px; line-height: 1.4">[Your own story]</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px"><span class="fc-k">UNIT OUTCOME</span><span style="font-family: 'EB Garamond', serif; font-size: 16px; line-height: 1.4">[One of the 5 C's: what this does for the unit]</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px"><span class="fc-k">MODULES</span><span style="font-size: 14px; line-height: 1.5">M01 · M09 · M17</span></div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end">
+<label style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Focus skill (required to open)<input class="fc-in" value="{{ focus }}" onChange="{{ onFocus }}" placeholder="The one skill everyone practices today"></label>
+<button class="fc-btn" disabled="{{ openSessionDisabled }}" onClick="{{ openSession }}">{{ openSessionLabel }}</button>
+</div>
+</div>
+<div class="fc-card">
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px"><h2 class="fc-h" style="font-size: 17px">Room control</h2><span style="font-size: 13px; color: #1F3A2E">[n] of 15 phones following</span></div>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center">
+<div style="display: flex; align-items: center; gap: 8px">
+<button class="fc-ghost" onClick="{{ slidePrev }}" aria-label="Previous slide">‹</button>
+<span style="font-size: 14px; min-width: 96px; text-align: center">Slide {{ slide }} / 13</span>
+<button class="fc-ghost" onClick="{{ slideNext }}" aria-label="Next slide">›</button>
+</div>
+<div style="display: flex; align-items: center; gap: 10px">
+<span class="fc-k">BRIDGE CLOCK</span>
+<span style="font-family: Cinzel, serif; font-size: 24px; font-weight: 700; color: #1F3A2E; min-width: 72px">{{ clock }}</span>
+<button class="fc-ghost" onClick="{{ toggleClock }}">{{ clockLabel }}</button>
+<button class="fc-ghost" onClick="{{ resetClock }}">Reset</button>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+<button class="fc-btn" disabled="{{ openDisabled }}" onClick="{{ openCheck }}">Open quick check</button>
+<button class="fc-btn" disabled="{{ revealDisabled }}" onClick="{{ revealCheck }}">Reveal answer</button>
+<button class="fc-ghost" disabled="{{ namesDisabled }}" onClick="{{ showNames }}">Show answers with names</button>
+<span class="fc-k">{{ checkState }}</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+<button class="fc-ghost" onClick="{{ scripted }}">Send scripted disruption</button>
+<button class="fc-ghost" onClick="{{ custom }}">Send custom disruption</button>
+<span style="font-size: 13px; color: #4A4A44">{{ disruption }}</span>
+</div>
+</div>
+<div class="fc-card">
+<h2 class="fc-h" style="font-size: 17px">Close the session</h2>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{ fidelity }}" as="f" hint-placeholder-count="8">
+<label style="display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px; cursor: pointer"><input type="checkbox" checked="{{ f.on }}" onChange="{{ f.toggle }}" style="width: 20px; height: 20px; accent-color: #1F3A2E">{{ f.label }}</label>
+</sc-for>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Self-debrief<textarea class="fc-in" rows="3" value="{{ debrief }}" onChange="{{ onDebrief }}" placeholder="What landed, what didn't, what changes next session"></textarea></label>
+<div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap"><button class="fc-btn" disabled="{{ closeDisabled }}" onClick="{{ closeSession }}">{{ closeLabel }}</button><span style="font-size: 13px; color: #4A4A44">{{ fidelityLine }}</span></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isFlags }}" hint-placeholder-val="{{ false }}">
+<div class="fc-card">
+<h1 class="fc-h">Safety flags</h1>
+<div style="font-family: 'EB Garamond', serif; font-size: 18px; line-height: 1.45">Raised by GENE's keyword pre-check, the model's flag, or a refusal. The learner already saw the fixed crisis-line message. Your job is the human follow-up under the unit's safety-routing protocol.</div>
+<sc-if value="{{ flagOpen }}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #D6CCB8; border-radius: 12px; padding: 12px 14px; background: #FBF8F2">
+<span style="font-size: 14px">[Learner ID] · sample · M01 GENE Outro · keyword pre-check · [time]</span>
+<button class="fc-ghost" onClick="{{ resolveFlag }}">Mark followed up</button>
+</div>
+</sc-if>
+<sc-if value="{{ flagDone }}" hint-placeholder-val="{{ false }}">
+<div style="background: #DDE6DC; color: #1F3A2E; border-radius: 10px; padding: 12px 14px; font-size: 14px">No open flags.</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isPresent }}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px"><h1 class="fc-h">Projector view</h1><span style="font-size: 13px; color: #4A4A44">Opens on the room screen</span></div>
+<div style="aspect-ratio: 16 / 9; background: #141413; border-radius: 14px; color: #F7F2E8; display: flex; flex-direction: column; justify-content: space-between; padding: 32px; box-sizing: border-box">
+<div style="display: flex; justify-content: space-between; font-size: 14px; opacity: 0.8"><span>M01 · Focus: {{ projFocus }}</span><span>Slide {{ slide }} / 13</span></div>
+<sc-if value="{{ projectNames }}" hint-placeholder-val="{{ false }}">
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{ tally }}" as="t" hint-placeholder-count="4">
+<div style="background: #1F3A2E; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 6px"><div style="font-family: Cinzel, serif; font-size: 20px">{{ t.opt }}</div><div style="font-size: 13px; opacity: 0.85">[names]</div></div>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{ projectSlide }}" hint-placeholder-val="{{ true }}">
+<div style="font-family: 'EB Garamond', serif; font-size: 32px; text-align: center; opacity: 0.9">[Deck slide image]</div>
+</sc-if>
+<div style="font-family: Cinzel, serif; font-size: 14px; letter-spacing: 4px; opacity: 0.7">AAPEX</div>
+</div>
+</div>
+</sc-if>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1040}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const unl = {}; unl[1] = true; unl[9] = true; unl[17] = true;
+    this.state = { tab: 'classes', roleOpen: false, classes: ['Cohort 1 · Malmstrom pilot'], cls: 0, newClass: '', unl: unl, dailyOn: true,
+      people: [{ r: 0, c: 0 }, { r: 1, c: 0 }, { r: 0, c: 0 }, { r: 2, c: 0 }, { r: 3, c: 0 }], invEmail: '', invClass: 0, invRole: 0, invMsg: '',
+      noms: [{ name: '[Nominee] · sample', by: 'Supervisor: [name]', reason: '[one-line reason]' }],
+      focus: '', opened: false, slide: 1, secs: 300, running: false, check: 'draft', disruption: '', fid: [false, false, false, false, false, false, false, false], debrief: '', closed: false, flagOpen: true };
+  }
+  componentDidMount() { this.timer = setInterval(() => { if (this.state.running && this.state.secs > 0) this.setState({ secs: this.state.secs - 1 }); }, 1000); }
+  componentWillUnmount() { clearInterval(this.timer); }
+  renderVals() {
+    const s = this.state; const set = (o) => this.setState(o);
+    const pad = (n) => (n < 10 ? 'M0' + n : 'M' + n);
+    const tabDefs = [['classes', 'Classes'], ['assign', 'Assign work'], ['people', 'People & roles'], ['live', 'Live session'], ['flags', 'Safety flags'], ['present', 'Projector view']];
+    const roles = ['Participant', 'Assistant', 'Facilitator candidate', 'Comparison group'];
+    const names = ['Phase 1', 'Phase 2', 'Phase 3'];
+    const sessions = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => { const opened = s.unl[n] && s.unl[n + 8] && s.unl[n + 16]; return { p: 'P' + n, mods: pad(n) + ' · ' + pad(n + 8) + ' · ' + pad(n + 16), focus: n === 1 && s.focus ? s.focus : '[focus skill]', status: n === 1 && s.closed ? 'Closed' : (n === 1 && s.opened ? 'Live' : (opened ? 'Assigned' : 'Not assigned')) }; });
+    const fidDone = s.fid.filter(Boolean).length;
+    const labels = { draft: 'NOT OPEN', open: 'OPEN · PHONES ANSWERING', revealed: 'ANSWER REVEALED', names: 'ON PROJECTOR WITH NAMES' };
+    const mm = Math.floor(s.secs / 60), ss = s.secs % 60;
+    return {
+      roleOpen: s.roleOpen, roleExpanded: s.roleOpen ? 'true' : 'false', toggleRole: () => set({ roleOpen: !s.roleOpen }),
+      flagBadge: s.flagOpen ? '1 open safety flag' : 'No open flags',
+      tabs: tabDefs.map((d) => ({ label: d[0] === 'flags' && s.flagOpen ? d[1] + ' (1)' : d[1], bg: s.tab === d[0] ? '#1F3A2E' : 'transparent', fg: s.tab === d[0] ? '#F7F2E8' : '#2B2B27', go: () => set({ tab: d[0] }) })),
+      isClasses: s.tab === 'classes', isAssign: s.tab === 'assign', isPeople: s.tab === 'people', isLive: s.tab === 'live', isFlags: s.tab === 'flags', isPresent: s.tab === 'present',
+      classCount: s.classes.length, className: s.classes[s.cls],
+      classChips: s.classes.map((c, i) => ({ name: c, bg: s.cls === i ? '#1F3A2E' : 'transparent', fg: s.cls === i ? '#F7F2E8' : '#1F3A2E', go: () => set({ cls: i }) })),
+      classLine: s.cls === 0 ? '15 participants · 18 comparison · 8 sessions across the year' : 'New class · no people yet · invite them under People & roles',
+      sessions: sessions, newClass: s.newClass, onNewClass: (e) => set({ newClass: e.target.value }), addClassDisabled: !s.newClass.trim(),
+      addClass: () => set({ classes: s.classes.concat([s.newClass]), cls: s.classes.length, newClass: '' }),
+      unlockCount: Object.keys(s.unl).filter((k) => s.unl[k]).length,
+      quick: [1, 2, 3, 4, 5, 6, 7, 8].map((n) => ({ label: 'P' + n + ': ' + pad(n) + ' · ' + pad(n + 8) + ' · ' + pad(n + 16), go: () => { const u = Object.assign({}, s.unl); u[n] = true; u[n + 8] = true; u[n + 16] = true; set({ unl: u }); } })),
+      dailyOn: s.dailyOn, toggleDaily: () => set({ dailyOn: !s.dailyOn }),
+      phases: [1, 2, 3].map((p) => ({ n: p, name: names[p - 1].toUpperCase(), mods: [1, 2, 3, 4, 5, 6, 7, 8].map((i) => { const n = (p - 1) * 8 + i, on = !!s.unl[n]; return { code: pad(n), on: on ? 'true' : 'false', bg: on ? '#1F3A2E' : '#FBF8F2', fg: on ? '#F7F2E8' : '#2B2B27', border: on ? '1px solid #1F3A2E' : '1px solid #BFB39C', toggle: () => { const u = Object.assign({}, s.unl); u[n] = !u[n]; set({ unl: u }); } }; }) })),
+      invEmail: s.invEmail, onInvEmail: (e) => set({ invEmail: e.target.value }), invClassName: s.classes[s.invClass], cycleInvClass: () => set({ invClass: (s.invClass + 1) % s.classes.length }),
+      invRoleName: roles[s.invRole], cycleInvRole: () => set({ invRole: (s.invRole + 1) % roles.length }), inviteDisabled: s.invEmail.indexOf('@') < 1,
+      invite: () => set({ people: s.people.concat([{ r: s.invRole, c: s.invClass }]), invEmail: '', invMsg: 'Invite sent with a single-use code [code] for ' + s.classes[s.invClass] + ' as ' + roles[s.invRole] + '.' }),
+      hasInvMsg: !!s.invMsg, invMsg: s.invMsg,
+      roster: s.people.map((p, i) => ({ id: '[Person ' + (i + 1) + ']', cls: s.classes[p.c], role: roles[p.r], cycle: () => { const x = s.people.slice(); x[i] = { r: (p.r + 1) % roles.length, c: p.c }; set({ people: x }); } })),
+      noms: s.noms.map((n, i) => ({ name: n.name, by: n.by, reason: n.reason, admit: () => { const x = s.noms.slice(); x.splice(i, 1); set({ noms: x, tab: 'people', invMsg: 'Nominee admitted. Invite code issued: [code]' }); }, decline: () => { const x = s.noms.slice(); x.splice(i, 1); set({ noms: x }); } })),
+      nomCount: s.noms.length, noNoms: s.noms.length === 0,
+      focus: s.focus, onFocus: (e) => set({ focus: e.target.value }), openSessionDisabled: s.opened || !s.focus.trim(), openSession: () => set({ opened: true }),
+      openSessionLabel: s.opened ? 'Session open ✓' : 'Open session', sessionState: s.opened ? 'OPEN · FOCUS: ' + s.focus.toUpperCase() : 'NOT OPEN',
+      slide: s.slide, slidePrev: () => set({ slide: Math.max(1, s.slide - 1) }), slideNext: () => set({ slide: Math.min(13, s.slide + 1) }),
+      clock: mm + ':' + (ss < 10 ? '0' + ss : ss), clockLabel: s.running ? 'Pause' : 'Start', toggleClock: () => set({ running: !s.running }), resetClock: () => set({ running: false, secs: 300 }),
+      checkState: labels[s.check], openDisabled: s.check !== 'draft', revealDisabled: s.check !== 'open', namesDisabled: s.check !== 'revealed',
+      openCheck: () => set({ check: 'open' }), revealCheck: () => set({ check: 'revealed' }), showNames: () => set({ check: 'names', tab: 'present' }),
+      scripted: () => set({ disruption: 'Scripted disruption sent: [from module file]' }), custom: () => set({ disruption: 'Custom disruption sent: [your text]' }), disruption: s.disruption,
+      fidelity: [1, 2, 3, 4, 5, 6, 7, 8].map((n, i) => ({ label: '[Fidelity item ' + n + ']', on: s.fid[i], toggle: () => { const f = s.fid.slice(); f[i] = !f[i]; set({ fid: f }); } })),
+      debrief: s.debrief, onDebrief: (e) => set({ debrief: e.target.value }),
+      closeDisabled: !(fidDone === 8 && s.debrief.trim() && !s.closed), closeSession: () => set({ closed: true }), closeLabel: s.closed ? 'Session closed ✓' : 'Close session',
+      fidelityLine: fidDone + ' of 8 fidelity items' + (s.debrief.trim() ? ' · debrief written' : ' · debrief missing'),
+      flagOpen: s.flagOpen, flagDone: !s.flagOpen, resolveFlag: () => set({ flagOpen: false }),
+      projFocus: s.focus || '[not set]', projectNames: s.check === 'names', projectSlide: s.check !== 'names', tally: ['A', 'B', 'C', 'D'].map((o) => ({ opt: o }))
+    };
+  }
+}
+</script>
+</body>
+</html>
