@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { env } from "@/lib/env";
+import { SignInCatcher } from "@/components/auth/FinishSignIn";
 
 export const metadata: Metadata = {
   metadataBase: new URL(env.siteUrl),
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
+        <SignInCatcher />
         {children}
       </body>
     </html>

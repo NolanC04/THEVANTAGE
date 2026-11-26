@@ -43,7 +43,8 @@ export async function signOut() {
 async function identity() {
   if (supabaseConfigured()) {
     const { data } = await (await supabaseSession()).auth.getUser();
-    return data.user?.email ? { id: data.user.id, email: data.user.email.toLowerCase() } : null;
+    const meta = (data.user?.user_metadata ?? {}) as Record<string, unknown>;
+    return data.user?.email ? { id: data.user.id, email: data.user.email.toLowerCase(), invite: typeof meta.apex_invite === "string" ? meta.apex_invite : null, consent: meta.apex_consent === "1" } : null;
   }
   if (!devAuth()) return null;
   const raw = (await cookies()).get(DEV_COOKIE)?.value;
@@ -62,12 +63,12 @@ export async function currentProfile(): Promise<Profile | null> {
   const existing = await db.get<Profile>("profiles", { id: who.id });
   if (existing) return existing;
   const jar = await cookies();
-  const code = jar.get("apex_invite")?.value?.toUpperCase();
+  const code = (jar.get("apex_invite")?.value ?? ("invite" in who ? who.invite : null) ?? undefined)?.toUpperCase();
   const invite = code ? await db.get<{ id: string; role: Role; unit: string | null; flight: string | null; class_id: string | null }>("invites", { code, active: true }) : null;
   const isEnvAdmin = Boolean(env.adminEmail && who.email === env.adminEmail);
   if (!invite && !isEnvAdmin) return null; // first sign-in needs an invite code
   const role: Role = isEnvAdmin ? "admin" : invite!.role;
-  const consented = jar.get("apex_consent")?.value === "1" ? new Date().toISOString() : null;
+  const consented = jar.get("apex_consent")?.value === "1" || ("consent" in who && who.consent) ? new Date().toISOString() : null;
   const profile = await db.insert<Profile>("profiles", { id: who.id, email: who.email, role, unit: invite?.unit ?? null, flight: invite?.flight ?? null, anon_id: newAnonId(), display_name: null, consented_at: consented });
   if (invite?.class_id) await db.insert("class_members", { class_id: invite.class_id, user_id: profile.id, role: role === "comparison" ? "comparison" : "cohort" });
   await db.insert("audit_log", { actor_id: profile.id, actor_anon: profile.anon_id, action: "profile.created", target: profile.id, detail: { role, via: invite ? "invite" : "env-admin" }, at: new Date().toISOString() });
