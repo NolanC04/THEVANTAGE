@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { devAuth, devSignIn, currentProfile, homeOf } from "@/lib/airman/auth";
-import { supabaseSession } from "@/lib/airman/supabase-server";
+import { sendMagicLink, RateLimited } from "@/lib/supabase-magic-link";
 import { store } from "@/lib/airman/store";
 import { env } from "@/lib/airman/env";
 import { ok, bad, fail, isEmail, str } from "@/lib/airman/api";
@@ -26,10 +26,12 @@ export async function POST(req: Request) {
       if (!p) return bad("That account isn't set up yet. Ask your facilitator for an invite code.", 403);
       return ok({ redirect: homeOf(p.role) });
     }
-    const { error } = await (await supabaseSession()).auth.signInWithOtp({ email, options: { emailRedirectTo: `${env.siteUrl}/airman/auth/callback` } });
-    if (error) throw new Error(error.message);
+    // The invite and consent also ride on the account itself, so a link opened in another browser still finds them.
+    const data = !b.returning ? { apex_invite: code, apex_consent: "1" } : undefined;
+    await sendMagicLink(email, `${env.siteUrl}/airman/auth/confirm`, data);
     return ok({ sent: true });
   } catch (e) {
+    if (e instanceof RateLimited) return bad(e.message, 429);
     return fail(e);
   }
 }

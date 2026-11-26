@@ -9,9 +9,9 @@ export async function GET(req: Request) {
     const { error } = await (await supabaseSession()).auth.exchangeCodeForSession(code);
     if (!error) {
       const p = await currentProfile();
-      if (!p) return NextResponse.redirect(`${env.siteUrl}/?error=invite`);
+      if (!p) return NextResponse.redirect(`${env.siteUrl}/airman?error=invite`);
       return NextResponse.redirect(`${env.siteUrl}${homeOf(p.role)}`);
     }
   }
-  return NextResponse.redirect(`${env.siteUrl}/?error=link`);
+  return NextResponse.redirect(`${env.siteUrl}/airman?error=link`);
 }
