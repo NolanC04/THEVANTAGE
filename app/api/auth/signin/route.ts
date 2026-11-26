@@ -1,5 +1,5 @@
 import { devAuth, devSignIn } from "@/lib/auth";
-import { sendMagicLink } from "@/lib/supabase-magic-link";
+import { sendMagicLink, RateLimited } from "@/lib/supabase-magic-link";
 import { env } from "@/lib/env";
 import { ok, bad, fail, isEmail, str } from "@/lib/api";
 
@@ -17,6 +17,7 @@ export async function POST(req: Request) {
     await sendMagicLink(b.email.trim(), `${env.siteUrl}/auth/confirm?next=${encodeURIComponent(next)}`);
     return ok({ sent: true });
   } catch (e) {
+    if (e instanceof RateLimited) return bad(e.message, 429);
     return fail(e);
   }
 }

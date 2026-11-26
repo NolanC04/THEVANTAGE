@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { devAuth, devSignIn, currentProfile, homeOf } from "@/lib/airman/auth";
-import { sendMagicLink } from "@/lib/supabase-magic-link";
+import { sendMagicLink, RateLimited } from "@/lib/supabase-magic-link";
 import { store } from "@/lib/airman/store";
 import { env } from "@/lib/airman/env";
 import { ok, bad, fail, isEmail, str } from "@/lib/airman/api";
@@ -31,6 +31,7 @@ export async function POST(req: Request) {
     await sendMagicLink(email, `${env.siteUrl}/airman/auth/confirm`, data);
     return ok({ sent: true });
   } catch (e) {
+    if (e instanceof RateLimited) return bad(e.message, 429);
     return fail(e);
   }
 }
